@@ -1,6 +1,6 @@
 /**
  * @file
- * js/ubl_details_tools.js
+ * js/details_tools.js
  */
 
 jQuery(document).ready(function() {
@@ -19,7 +19,7 @@ jQuery(document).ready(function() {
       $metadataTable.find('TBODY').append('<TR><TH>' + usetitle + '</TH><TD>' + usecontent + '</TD></TR>'); 
     }
   } 
-  jQuery('.ubl-detail-tools LI A .fa-download').parent().click(function (e) {
+  jQuery('.detail-tools LI A .fa-download').parent().click(function (e) {
     var $li = jQuery(this).parent();
     if ($additionalblock.size() > 0) {
       e.preventDefault();

@@ -7,9 +7,9 @@
  *
  *  Copyright 2017 Leiden University Library
  *
- *  This file is part of ubl_access_rights_from_metadata.
+ *  This file is part of islandora_conditional_access_rights.
  *
- *  ubl_access_rights_from_metadata is free software: you can redistribute it and/or modify
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -24,31 +24,31 @@
  *
  */
 
-function ubl_access_rights_from_metadata_xacml_modify_if_needed($obj, $config) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_xacml_modify_if_needed($obj, $config) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $accessrightsvalue = ubl_access_rights_from_metadata_get_access_rights_value($obj, $config);
+  $accessrightsvalue = islandora_conditional_access_rights_get_access_rights_value($obj, $config);
 
-  $accesssettings = ubl_access_rights_from_metadata_get_all_access_rights_settings($accessrightsvalue, $config, TRUE, array('deny_access_to_dsid', 'allow_access_to_dsid', 'allow_access_for_role'));
+  $accesssettings = islandora_conditional_access_rights_get_all_access_rights_settings($accessrightsvalue, $config, TRUE, array('deny_access_to_dsid', 'allow_access_to_dsid', 'allow_access_for_role'));
 
   if (isset($accesssettings)) {
-    ubl_access_rights_from_metadata_xacml_modify_with_settings($obj, $accesssettings);
+    islandora_conditional_access_rights_xacml_modify_with_settings($obj, $accesssettings);
 
     // Apply the access rights also to children of this object that don't have access rights themselves.
-    ubl_access_rights_from_metadata_xacml_modify_children($obj, $config, $accesssettings);
+    islandora_conditional_access_rights_xacml_modify_children($obj, $config, $accesssettings);
   }
 }
 
-function ubl_access_rights_from_metadata_xacml_modify_children($obj, $config, $accesssettings) {
+function islandora_conditional_access_rights_xacml_modify_children($obj, $config, $accesssettings) {
 
   if (in_array('islandora:bookCModel', $obj->models)) {
     if (module_load_include('inc', 'islandora_paged_content', 'includes/utilities')) {
       $pages = islandora_paged_content_get_pages($obj);
       foreach ($pages as $pagepid => $pageinfo) {
         $childobj = islandora_object_load($pagepid);
-        $childaccessrightsvalue = ubl_access_rights_from_metadata_get_access_rights_value($childobj, $config);
+        $childaccessrightsvalue = islandora_conditional_access_rights_get_access_rights_value($childobj, $config);
         if (!$childaccessrightsvalue) {
-          ubl_access_rights_from_metadata_xacml_modify_with_settings($childobj, $accesssettings);
+          islandora_conditional_access_rights_xacml_modify_with_settings($childobj, $accesssettings);
         }
       }
     }
@@ -57,23 +57,23 @@ function ubl_access_rights_from_metadata_xacml_modify_children($obj, $config, $a
     $compoundparts = islandora_compound_object_get_parts($obj->id);
     foreach ($compoundparts as $partpid) {
       $childobj = islandora_object_load($partpid);
-      $childaccessrightsvalue = ubl_access_rights_from_metadata_get_access_rights_value($childobj, $config);
+      $childaccessrightsvalue = islandora_conditional_access_rights_get_access_rights_value($childobj, $config);
       if (!$childaccessrightsvalue) {
-        ubl_access_rights_from_metadata_xacml_modify_with_settings($childobj, $accesssettings);
-        ubl_access_rights_from_metadata_xacml_modify_children($childobj, $config, $accesssettings);
+        islandora_conditional_access_rights_xacml_modify_with_settings($childobj, $accesssettings);
+        islandora_conditional_access_rights_xacml_modify_children($childobj, $config, $accesssettings);
       }
     }
   }
 }
 
-function ubl_access_rights_from_metadata_xacml_modify_with_settings($obj, $accesssettings) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_xacml_modify_with_settings($obj, $accesssettings) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $xacml = NULL;
   $haschanges = FALSE;
 
-  $denydsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
-  $allowdsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
+  $denydsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
+  $allowdsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
   $allowedroles = isset($accesssettings['allow_access_for_role'])?$accesssettings['allow_access_for_role']:array();
 
   // Remove the allowed dsids from the denied dsids.

@@ -1,8 +1,8 @@
-# UBL access rights from metadata
+# Islandora conditional access rights
 
 ## Introduction
 
-UBL Access rights from metadata lets you define the access rights of an object from a value of the metadata of that object or of one of its parents.
+Islandora conditional access rights lets you define the access rights of an object from a value of the metadata of that object or of one of its parents.
 Optionally the XACML policy is changed based on the metadata of the object.
 It also defines which datastreams are downloadable.
 
@@ -18,14 +18,14 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 ## Configuration
 
-At `admin/islandora/tools/ubl_access_rights_from_metadata` the configuration location can be defined. This should be an absolute file path
+At `admin/islandora/tools/access_rights` the configuration location can be defined. This should be an absolute file path
 or a URL to the configuration file. See 'ini file' for more information.
 
 The 'Enable XACML' checkbox enables the modification of the XACML policy of the object whose metadata has changed. This is only useful if the
 objects can be accessed directly inside Fedora and you want to have access rights in Fedora as well. However, this will have some drawbacks,
 because everytime the metadata changes, potentially the XACML policy of the object (and all of its children!) is changed as well.
 If you only access your objects through Drupal, there is no need to enable XACML restrictions.
-PLEASE NOTE: IP range restrictions can only be inforced through Islandora and not through XACML policies, so these will never have XACML policies.
+PLEASE NOTE: IP range restrictions can only be enforced through Drupal/Islandora and not through XACML policies, so these will never have XACML policies.
 
 ### ini file
 
@@ -34,8 +34,6 @@ for more information about this format. PHP has some special features, such as s
 See the `example_ini_files` directory for examples.
 
 The configuration file should have the following parts:
-
-The values of the "`*_to_dsid`" and "`provide_download_of_dsid`" keys should be valid DSID's, or ALL (for all datastreams) or NONE (for no datastream at all).
 
 Below examples of the parts of the configuration file:
 
@@ -77,6 +75,8 @@ A "access:" section can contain the following keys:
  * `access_usetext`: the access use text. (optional)
  * `access_link`: the absolute link to the access rights explanation page. (optional)
  * `access_image`: the absolute URL of an image. (optional)
+
+The values of the "`*_to_dsid`" and "`provide_download_of_dsid`" keys should be valid DSID's, or ALL (for all datastreams) or NONE (for no datastream at all).
 
 ## Documentation
 

@@ -2,14 +2,14 @@
 
 /**
  * @file
- * The admin form for the UBL access rights from metadata module.
+ * The admin form for the Islandora conditional access rights module.
  *
  *
  *  Copyright 2017 Leiden University Library
  *
- *  This file is part of ubl_access_rights_from_metadata.
+ *  This file is part of islandora_conditional_access_rights.
  *
- *  ubl_access_rights_from_metadata is free software: you can redistribute it and/or modify
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -30,8 +30,8 @@
  * @see drupal_get_form
  */
 
-function ubl_access_rights_from_metadata_admin_form(array $form, array &$form_state) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+function islandora_conditional_access_rights_admin_form(array $form, array &$form_state) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
   $form = array();
 
@@ -39,11 +39,11 @@ function ubl_access_rights_from_metadata_admin_form(array $form, array &$form_st
     $config_location = $form_state['input']['config_location'];
   }
   else {
-    $config_location = variable_get('ubl_access_rights_from_metadata_config_location');
+    $config_location = variable_get('islandora_conditional_access_rights_config_location');
   }
-  $tn_url = variable_get('ubl_access_rights_from_metadata_tn_url');
-  $enable_xacml = variable_get('ubl_access_rights_from_metadata_enable_xacml', FALSE);
-  $defaults = ubl_access_rights_from_metadata_default_settings();
+  $tn_url = variable_get('islandora_conditional_access_rights_tn_url');
+  $enable_xacml = variable_get('islandora_conditional_access_rights_enable_xacml', FALSE);
+  $defaults = islandora_conditional_access_rights_default_settings();
 
   $form['config'] = array(
     '#type' => 'fieldset',
@@ -72,7 +72,7 @@ function ubl_access_rights_from_metadata_admin_form(array $form, array &$form_st
     '#title' => t('Defaults'),
   );
   foreach ($defaults as $defaultkey => $defaultsetting) {
-    $default = variable_get('ubl_access_rights_from_metadata_default_' . $defaultkey, '');
+    $default = variable_get('islandora_conditional_access_rights_default_' . $defaultkey, '');
     if ($defaultsetting['type'] === 'dsids') {
       $default = implode(',', $default);
     }
@@ -96,17 +96,17 @@ function ubl_access_rights_from_metadata_admin_form(array $form, array &$form_st
   return $form;
 }
 
-function ubl_access_rights_from_metadata_admin_form_validate(array $form, array &$form_state) {
+function islandora_conditional_access_rights_admin_form_validate(array $form, array &$form_state) {
   $newloc = $form_state['values']['location'];
 
   if (strlen($newloc) > 0) {
-    module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+    module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
     $error = '';
-    if (ubl_access_rights_from_metadata_valid_config_file($newloc, $error) === FALSE) {
+    if (islandora_conditional_access_rights_valid_config_file($newloc, $error) === FALSE) {
       form_set_error('location', $error);
     }
   }
-  $defaults = ubl_access_rights_from_metadata_default_settings();
+  $defaults = islandora_conditional_access_rights_default_settings();
   foreach ($defaults as $defaultkey => $defaultsetting) {
     $value = $form_state['values'][$defaultkey];
     if (empty($value)) {
@@ -133,32 +133,32 @@ function ubl_access_rights_from_metadata_admin_form_validate(array $form, array 
   }
 }
 
-function ubl_access_rights_from_metadata_admin_form_submit(array $form, array &$form_state) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+function islandora_conditional_access_rights_admin_form_submit(array $form, array &$form_state) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
-  $oldconfiglocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  variable_set('ubl_access_rights_from_metadata_config_location', $form_state['values']['location']);
-  variable_set('ubl_access_rights_from_metadata_enable_xacml', $form_state['values']['enable_xacml']);
-  variable_set('ubl_access_rights_from_metadata_tn_url', $form_state['values']['tn_url']);
+  $oldconfiglocation = variable_get('islandora_conditional_access_rights_config_location');
+  variable_set('islandora_conditional_access_rights_config_location', $form_state['values']['location']);
+  variable_set('islandora_conditional_access_rights_enable_xacml', $form_state['values']['enable_xacml']);
+  variable_set('islandora_conditional_access_rights_tn_url', $form_state['values']['tn_url']);
   if ($oldconfiglocation) {
-    ubl_access_rights_from_metadata_refresh_configuration($oldconfiglocation);
+    islandora_conditional_access_rights_refresh_configuration($oldconfiglocation);
   }
-  $defaults = ubl_access_rights_from_metadata_default_settings();
+  $defaults = islandora_conditional_access_rights_default_settings();
   foreach ($defaults as $defaultkey => $defaultsetting) {
     if ($defaultsetting['type'] === 'dsids') {
-      variable_set('ubl_access_rights_from_metadata_default_' . $defaultkey, explode(',', $form_state['values'][$defaultkey]));
+      variable_set('islandora_conditional_access_rights_default_' . $defaultkey, explode(',', $form_state['values'][$defaultkey]));
     }
     elseif ($defaultsetting['type'] === 'boolean') {
       if ($form_state['values'][$defaultkey] === '') {
-        variable_del('ubl_access_rights_from_metadata_default_' . $defaultkey);
+        variable_del('islandora_conditional_access_rights_default_' . $defaultkey);
       }
       else {
-        variable_set('ubl_access_rights_from_metadata_default_' . $defaultkey, ($form_state['values'][$defaultkey] === 'TRUE')?TRUE:FALSE);
+        variable_set('islandora_conditional_access_rights_default_' . $defaultkey, ($form_state['values'][$defaultkey] === 'TRUE')?TRUE:FALSE);
       }
     }
     else {
-      variable_set('ubl_access_rights_from_metadata_default_' . $defaultkey, $form_state['values'][$defaultkey]);
+      variable_set('islandora_conditional_access_rights_default_' . $defaultkey, $form_state['values'][$defaultkey]);
     }
   }
 

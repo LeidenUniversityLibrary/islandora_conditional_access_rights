@@ -7,9 +7,9 @@
  *
  *  Copyright 2017 Leiden University Library
  *
- *  This file is part of ubl_access_rights_from_metadata.
+ *  This file is part of islandora_conditional_access_rights.
  *
- *  ubl_access_rights_from_metadata is free software: you can redistribute it and/or modify
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -24,7 +24,7 @@
  *
  */
 
-function ubl_access_rights_from_metadata_valid_config_file($inifile, &$error) {
+function islandora_conditional_access_rights_valid_config_file($inifile, &$error) {
   $error = '';
   $inicontent = @file_get_contents($inifile);
 
@@ -32,11 +32,11 @@ function ubl_access_rights_from_metadata_valid_config_file($inifile, &$error) {
     $error = "Error reading file '$inifile'.";
     return FALSE;
   }
-  return _ubl_access_rights_from_metadata_valid_config_content($inicontent, $inifile, $error);
+  return _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, $error);
 }
   
-function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $inifile, &$error) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+function _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, &$error) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
   $accessconfig = parse_ini_string($inicontent, TRUE);
 
@@ -56,7 +56,7 @@ function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $ini
     if (has_prefix($key, 'metadata:')) {
       $mandatory = array('datastream' => '/^[A-Z0-9]+$/', 'xpath' => '');
       $optional = array('namespace' => array());
-      if (!_ubl_access_rights_from_metadata_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
+      if (!_islandora_conditional_access_rights_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
         return FALSE;
       }
       $sections['metadata'][] = $sectionname;
@@ -72,7 +72,7 @@ function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $ini
         'comparator' => '',
         'value' => '',
       );
-      if (!_ubl_access_rights_from_metadata_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
+      if (!_islandora_conditional_access_rights_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
         return FALSE;
       }
       if (isset($values['operator'])) {
@@ -94,7 +94,7 @@ function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $ini
         return FALSE;
       }
       elseif (isset($values['comparator'])) {
-        $prefix = '_ubl_access_rights_from_metadata_comparator_';
+        $prefix = '_islandora_conditional_access_rights_comparator_';
         $compfunc = $prefix . preg_replace('/[^a-zA-Z0-9]/', '', $values['comparator']);
         if (!function_exists($compfunc)) {
           $allfuncs = get_defined_functions();
@@ -136,7 +136,7 @@ function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $ini
         'access_link' => '/^https?:.*/',
         'access_image' => '/^https?:.*/',
       );
-      if (!_ubl_access_rights_from_metadata_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
+      if (!_islandora_conditional_access_rights_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
         return FALSE;
       }
       $sections['access'][] = $sectionname;
@@ -168,7 +168,7 @@ function _ubl_access_rights_from_metadata_valid_config_content($inicontent, $ini
   return TRUE;
 }
 
-function _ubl_access_rights_from_metadata_valid_subkeys($config, $section, $mandatory, $optional, &$error) {
+function _islandora_conditional_access_rights_valid_subkeys($config, $section, $mandatory, $optional, &$error) {
   $additional = array_diff_key($config, $mandatory, $optional);
   foreach ($additional as $ak => $av) {
     $error = t("Section '@section' contains an additional key '@key' (with value '@value') that should not be there.", array("@section" => $section, "@key" => $ak, "@value" => is_array($config[$ak])?implode(",", $config[$ak]):(string)$config[$ak]));
@@ -203,12 +203,12 @@ function _ubl_access_rights_from_metadata_valid_subkeys($config, $section, $mand
   return TRUE;
 }
 
-function ubl_access_rights_from_metadata_get_configuration($configlocation) {
+function islandora_conditional_access_rights_get_configuration($configlocation) {
   $config = &drupal_static(__FUNCTION__);
 
   if (!isset($config[$configlocation])) {
     $cachename = $configlocation;
-    $cachebin = 'cache_ubl_access_rights_from_metadata_config';
+    $cachebin = 'cache_islandora_conditional_access_rights_config';
     if ($cache = cache_get($cachename, $cachebin)) {
       $data = $cache->data;
       if (is_file($configlocation)) {
@@ -224,10 +224,10 @@ function ubl_access_rights_from_metadata_get_configuration($configlocation) {
     if (!isset($config[$configlocation])) {
       $inicontent = @file_get_contents($configlocation);
       $error = '';
-      $isvalid = _ubl_access_rights_from_metadata_valid_config_content($inicontent, 'access config', $error);
+      $isvalid = _islandora_conditional_access_rights_valid_config_content($inicontent, 'access config', $error);
       if (!$isvalid) {
         // config is not valid; the only save thing we can do is bail...
-        $error = "Error when reading configuration of 'access rights from metadata': $error";
+        $error = "Error when reading configuration of 'Islandora conditional access rights': $error";
         throw new RuntimeException($error);
       }
       $aconfig = array();
@@ -273,9 +273,9 @@ function ubl_access_rights_from_metadata_get_configuration($configlocation) {
   return $config[$configlocation];
 }
 
-function ubl_access_rights_from_metadata_refresh_configuration($configlocation) {
+function islandora_conditional_access_rights_refresh_configuration($configlocation) {
   $cachename = $configlocation;
-  $cachebin = 'cache_ubl_access_rights_from_metadata_config';
+  $cachebin = 'cache_islandora_conditional_access_rights_config';
   cache_clear_all($cachename, $cachebin); 
 }
 

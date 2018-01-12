@@ -1,13 +1,13 @@
 /**
  * @file
- * js/ubl_access_rights_from_metadata.js
+ * js/conditional_access_rights.js
  *
  *
  *  Copyright 2017 Leiden University Library
  *
- *  This file is part of ubl_access_rights_from_metadata.
+ *  This file is part of islandora_condtional_access_rights.
  *
- *  ubl_access_rights_from_metadata is free software: you can redistribute it and/or modify
+ *  islandora_condtional_access_rights is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -24,9 +24,9 @@
 
 (function ($) {
   var tnurl = '';
-  Drupal.behaviors.ubl_access_rights_from_metadata = {
+  Drupal.behaviors.conditional_access_rights = {
     attach: function(context, settings) {
-      tnurl = settings.ubl_access_rights_from_metadata.tn_access_restricted;
+      tnurl = settings.conditional_access_rights.tn_access_restricted;
     }
   }
   var replaceInaccessibleThumbnail = function() {

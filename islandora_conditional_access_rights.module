@@ -2,14 +2,14 @@
 
 /**
  * @file
- * ubl_access_rights_from_metadata
+ * islandora_conditional_access_rights
  *
  *
  *  Copyright 2017 Leiden University Library
  *
- *  This file is part of ubl_access_rights_from_metadata.
+ *  This file is part of islandora_conditional_access_rights.
  *
- *  ubl_access_rights_from_metadata is free software: you can redistribute it and/or modify
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
@@ -26,40 +26,39 @@
 
 
 // Permissions.
-define('UBL_ACCESS_RIGHTS_FROM_METADATA_ADMIN', 'Access rights from metadata admin');
-define('UBL_ACCESS_RIGHTS_FROM_METADATA_OBJECT', 'Access rights from metadata object');
+define('ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_ADMIN_PERMISSION', 'Islandora conditional access rights admin permission');
+define('ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_FOR_OBJECT_PERMISSION', 'Islandora conditional access rights for object permission');
 
 /**
  * Implements hook_init().
  */
-function ubl_access_rights_from_metadata_init() {
-  $tnaccessrestricted = variable_get('ubl_access_rights_from_metadata_tn_url');
+function islandora_conditional_access_rights_init() {
+  $tnaccessrestricted = variable_get('islandora_conditional_access_rights_tn_url');
   if ($tnaccessrestricted) {
-    drupal_add_js(array('ubl_access_rights_from_metadata' => array('tn_access_restricted' => $tnaccessrestricted)), array('type' => 'setting'));
-    drupal_add_js(drupal_get_path('module', 'ubl_access_rights_from_metadata') . '/js/ubl_access_rights_from_metadata.js');
+    drupal_add_js(array('islandora_conditional_access_rights' => array('tn_access_restricted' => $tnaccessrestricted)), array('type' => 'setting'));
+    drupal_add_js(drupal_get_path('module', 'islandora_conditional_access_rights') . '/js/islandora_conditional_access_rights.js');
   }
 }
 
 /**
  * Implements hook_menu().
  */
-function ubl_access_rights_from_metadata_menu() {
+function islandora_conditional_access_rights_menu() {
   $items = array();
-  $items['admin/islandora/tools/ubl_access_rights_from_metadata'] = array(
-    'title' => 'UBL Access rights from metadata',
-    'description' => 'The location of the configuration for UBL Access rights from metadata.',
+  $items['admin/islandora/tools/islandora_conditional_access_rights'] = array(
+    'title' => 'Islandora conditional access rights',
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('ubl_access_rights_from_metadata_admin_form'),
-    'access arguments' => array(UBL_ACCESS_RIGHTS_FROM_METADATA_ADMIN),
+    'page arguments' => array('islandora_conditional_access_rights_admin_form'),
+    'access arguments' => array(ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_ADMIN_PERMISSION),
     'file' => 'includes/admin.form.inc',
   );
-  $items['islandora/object/%islandora_object/manage/access_rights_from_metadata'] = array(
-    'title' => 'Access rights from metadata',
+  $items['islandora/object/%islandora_object/manage/access_rights'] = array(
+    'title' => 'Conditional access rights',
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
     'page callback' => 'drupal_get_form',
     'page arguments' => array('access_rights_view_form', 2),
-    'access arguments' => array(UBL_ACCESS_RIGHTS_FROM_METADATA_OBJECT),
+    'access arguments' => array(ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_FOR_OBJECT_PERMISSION),
     'file' => 'includes/object.form.inc',
   );
 
@@ -69,12 +68,12 @@ function ubl_access_rights_from_metadata_menu() {
 /**
  * Implements hook_permission().
  */
-function ubl_access_rights_from_metadata_permission() {
+function islandora_conditional_access_rights_permission() {
   return array(
-    UBL_ACCESS_RIGHTS_FROM_METADATA_ADMIN => array(
+    ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_ADMIN_PERMISSION => array(
       'title' => t('Administer configuration'),
     ),
-    UBL_ACCESS_RIGHTS_FROM_METADATA_OBJECT => array(
+    ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_FOR_OBJECT_PERMISSION => array(
       'title' => t('See object\'s access rights'),
     ),
   );
@@ -85,27 +84,27 @@ function ubl_access_rights_from_metadata_permission() {
  * Implements hook_detail_tools_block_view().
  * This hook is used inside the templates to display the detail tools block with buttons.
  */
-function ubl_access_rights_from_metadata_detail_tools_block_view() {
+function islandora_conditional_access_rights_detail_tools_block_view() {
   $block = array();
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   if (!$configlocation) {
     return $block;
   }
 
   module_load_include('inc', 'islandora', 'includes/utilities');
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
   if (arg(1) == 'object' && islandora_is_valid_pid(arg(2))) {
-    drupal_add_css(drupal_get_path('module', 'ubl_access_rights_from_metadata') . '/css/ubl_details_tools.css');
-    drupal_add_js(drupal_get_path('module', 'ubl_access_rights_from_metadata') . '/js/ubl_details_tools.js');
+    drupal_add_css(drupal_get_path('module', 'islandora_conditional_access_rights') . '/css/details_tools.css');
+    drupal_add_js(drupal_get_path('module', 'islandora_conditional_access_rights') . '/js/details_tools.js');
 
     $obj = islandora_object_load(arg(2));
 
     // List of downloadable datastreams.
     $units = array( 'bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB');
     $url = current_path();
-    $dsidswlabel = ubl_access_rights_from_metadata_downloadable_dsids_with_label($obj);
+    $dsidswlabel = islandora_conditional_access_rights_downloadable_dsids_with_label($obj);
     $additional = '';
     $hasfiles = FALSE;
     $additional .= '<h3>Download</h3>';
@@ -128,7 +127,7 @@ function ubl_access_rights_from_metadata_detail_tools_block_view() {
     }
 
     // Describe the access rights.
-    $access = ubl_access_rights_from_metadata_access_description($obj);
+    $access = islandora_conditional_access_rights_access_description($obj);
     if ($access && count($access) > 0) {
       $additional .= '<TABLE class="access">';
       $additional .= '<TBODY>';
@@ -160,7 +159,7 @@ function ubl_access_rights_from_metadata_detail_tools_block_view() {
     // Put this in a item list.
     $block['list'] = array(
       '#type' => 'ul',
-      '#attributes' => array('class' => array('dc-detail-tools', 'ubl-detail-tools')),
+      '#attributes' => array('class' => array('dc-detail-tools', 'detail-tools')),
       '#items' => array(
         array(
           'data' => l(
@@ -183,11 +182,11 @@ function ubl_access_rights_from_metadata_detail_tools_block_view() {
 /**
  * Implements hook_preprocess()
  **/
-function ubl_access_rights_from_metadata_preprocess(&$variables, $hook) {
+function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
   if ($hook === 'islandora_book_book') {
     // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range... do it here...
     if (isset($variables['object']) && isset($variables['viewer_id'])) {
-      module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+      module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
       $object = $variables['object'];
 
@@ -196,7 +195,7 @@ function ubl_access_rights_from_metadata_preprocess(&$variables, $hook) {
       global $user;
       foreach ($pages as $pageid => $pageinfo) {
         $pageobj = islandora_object_load($pageid);
-        $access = _ubl_access_rights_from_metadata_islandora_datastream_access_on_object($pageobj, 'JP2', $user);
+        $access = _islandora_conditional_access_rights_islandora_datastream_access_on_object($pageobj, 'JP2', $user);
         if ($access !== FALSE) {
           $newpages[$pageid] = $pageinfo;
         }
@@ -213,16 +212,16 @@ function ubl_access_rights_from_metadata_preprocess(&$variables, $hook) {
 /**
  * Implements hook_islandora_object_access($op, $object, $user)
  **/
-function ubl_access_rights_from_metadata_islandora_object_access($op, $object, $user) {
+function islandora_conditional_access_rights_islandora_object_access($op, $object, $user) {
   if ($op === ISLANDORA_VIEW_OBJECTS) {
-    $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
+    $configlocation = variable_get('islandora_conditional_access_rights_config_location');
     if (!$configlocation) {
       return NULL;
     }
 
-    module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
+    module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
-    return ubl_access_rights_from_metadata_accessible_object($object);
+    return islandora_conditional_access_rights_accessible_object($object);
   }
   return NULL;
 }
@@ -230,9 +229,9 @@ function ubl_access_rights_from_metadata_islandora_object_access($op, $object, $
 /**
  * Implements hook_islandora_datastream_access()
  **/
-function ubl_access_rights_from_metadata_islandora_datastream_access($op, $islandora_datastream, $user) {
+function islandora_conditional_access_rights_islandora_datastream_access($op, $islandora_datastream, $user) {
   if ($op === ISLANDORA_VIEW_OBJECTS) {
-    $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
+    $configlocation = variable_get('islandora_conditional_access_rights_config_location');
     if (!$configlocation) {
       return NULL;
     }
@@ -240,21 +239,21 @@ function ubl_access_rights_from_metadata_islandora_datastream_access($op, $islan
     $obj = $islandora_datastream->parent;
     $dsid = $islandora_datastream->id;
   
-    return _ubl_access_rights_from_metadata_islandora_datastream_access_on_object($obj, $dsid, $user);
+    return _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user);
   }
   return NULL;
 }
 
-function _ubl_access_rights_from_metadata_islandora_datastream_access_on_object($obj, $dsid, $user) {
+function _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user) {
   // Check if the datastream is restricted.
-  $restricted = ubl_access_rights_from_metadata_restricted_dsids($obj);
+  $restricted = islandora_conditional_access_rights_restricted_dsids($obj);
   if (in_array($dsid, $restricted)) {
     // This datastream is restricted and cannot be accessed.
     return FALSE;
   }
   
   // Check if the datastream is allowed.
-  $allowed = ubl_access_rights_from_metadata_accessible_dsids($obj); 
+  $allowed = islandora_conditional_access_rights_accessible_dsids($obj); 
   if (in_array($dsid, $allowed)) {
     // This datastream is allowed and can be accessed.
     return TRUE;
@@ -268,22 +267,22 @@ function _ubl_access_rights_from_metadata_islandora_datastream_access_on_object(
 /**
  * Implements hook_islandora_datastream_modified().
  **/
-function ubl_access_rights_from_metadata_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
+function islandora_conditional_access_rights_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
   if ($object && $datastream) {
-    $configlocation = variable_get('ubl_access_rights_from_metadata_config_location'); 
+    $configlocation = variable_get('islandora_conditional_access_rights_config_location'); 
     if (!$configlocation) {
       return;
     }
 
-    module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+    module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-    $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+    $config = islandora_conditional_access_rights_get_configuration($configlocation);
     if (isset($config['_config']['rightssource']['dsid']) && $datastream->id === $config['_config']['rightssource']['dsid']) {
-      module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/xacml');
+      module_load_include('inc', 'islandora_conditional_access_rights', 'includes/xacml');
      
-      if (variable_get('ubl_access_rights_from_metadata_enable_xacml', FALSE)) {
+      if (variable_get('islandora_conditional_access_rights_enable_xacml', FALSE)) {
         // Set XACML rights according to configuration.
-        ubl_access_rights_from_metadata_xacml_modify_if_needed($object, $config);
+        islandora_conditional_access_rights_xacml_modify_if_needed($object, $config);
       }
     }
   }
@@ -292,18 +291,18 @@ function ubl_access_rights_from_metadata_islandora_datastream_modified(AbstractO
 /**
  * Implements hook_flush_caches().
  */
-function ubl_access_rights_from_metadata_flush_caches() {
-  return array('cache_ubl_access_rights_from_metadata_config','cache_ubl_access_rights_from_metadata_md_value');
+function islandora_conditional_access_rights_flush_caches() {
+  return array('cache_islandora_conditional_access_rights_config','cache_islandora_conditional_access_rights_md_value');
 }
 
 /**
  * Implements hook_boot().
  */
-function ubl_access_rights_from_metadata_boot() {
+function islandora_conditional_access_rights_boot() {
   // disable caching for islandora objects
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
   
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location'); 
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location'); 
   if (!$configlocation) {
     return;
   }
@@ -316,11 +315,11 @@ function ubl_access_rights_from_metadata_boot() {
     if (islandora_is_valid_pid($objectid)) {
       $object = islandora_object_load($objectid);
       if ($object) {
-        module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/access_rights_settings');
-        module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+        module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
+        module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-        $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
-        $settings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($object, $config);
+        $config = islandora_conditional_access_rights_get_configuration($configlocation);
+        $settings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($object, $config);
 
         if (isset($settings['_ip_dependent']) && $settings['_ip_dependent']) {
           drupal_page_is_cacheable(FALSE);

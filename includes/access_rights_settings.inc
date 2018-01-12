@@ -5,8 +5,8 @@
  * Calculate the access rights settings for a specific object.
  */
 
-function ubl_access_rights_from_metadata_access_rights_settings_for_object($object, $config, $neededkeys = NULL) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/metadata_value');
+function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config, $neededkeys = NULL) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
 
   $accessrights = array();
   
@@ -17,7 +17,7 @@ function ubl_access_rights_from_metadata_access_rights_settings_for_object($obje
   $isipdependent = FALSE;
 
   foreach ($conditionconfig as $conditionname => $conditionvalues) {
-    $conditions[$conditionname] = _ubl_access_rights_from_metadata_evaluate_condition($conditionvalues, $object, $conditions, $config);
+    $conditions[$conditionname] = _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $conditions, $config);
     if ($conditions[$conditionname]) {
       $conditionsmet[$conditionname] = FALSE;
     }
@@ -33,7 +33,7 @@ function ubl_access_rights_from_metadata_access_rights_settings_for_object($obje
       }
       $accessrights = $accessrights + $accessvalues;
       $conditionsmet[$accessname] = TRUE;
-      if (!$isipdependent && _ubl_access_rights_from_metadata_is_ip_dependent($accessname, $config)) {
+      if (!$isipdependent && _islandora_conditional_access_rights_is_ip_dependent($accessname, $config)) {
         $isipdependent = TRUE;
       }
     }
@@ -45,30 +45,30 @@ function ubl_access_rights_from_metadata_access_rights_settings_for_object($obje
   return $accessrights;
 }
 
-function _ubl_access_rights_from_metadata_is_ip_dependent($conditionname, $config) {
+function _islandora_conditional_access_rights_is_ip_dependent($conditionname, $config) {
   $isipdependent = FALSE;
   if (array_key_exists('ip_range', $config['condition'][$conditionname])) {
     $isipdependent = TRUE;
   }
   if (!$isipdependent && array_key_exists('condition', $config['condition'][$conditionname])) {
     foreach ($config['condition'][$conditionname]['condition'] as $subconditionname) {
-      $isipdependent = $isipdependent || _ubl_access_rights_from_metadata_is_ip_dependent($subconditionname, $config);
+      $isipdependent = $isipdependent || _islandora_conditional_access_rights_is_ip_dependent($subconditionname, $config);
     }
   }
   return $isipdependent;
 }
 
-function _ubl_access_rights_from_metadata_evaluate_condition($conditionvalues, $object, $existingconditions, $config) {
+function _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $existingconditions, $config) {
   $results = array();
   $operator = 'and';
   if (isset($conditionvalues['operator'])) {
     $operator = $conditionvalues['operator'];
   }
   if (isset($conditionvalues['metadata'], $conditionvalues['comparator'], $conditionvalues['value'])) {
-    $mdvalue = ubl_access_rights_from_metadata_get_metadata_value($object, $config, $conditionvalues['metadata']); 
+    $mdvalue = islandora_conditional_access_rights_get_metadata_value($object, $config, $conditionvalues['metadata']); 
     $comparator = $conditionvalues['comparator'];
     $value = $conditionvalues['value'];
-    $prefix = '_ubl_access_rights_from_metadata_comparator_';
+    $prefix = '_islandora_conditional_access_rights_comparator_';
     $compfunc = $prefix . $comparator;
 
     $results[] = $compfunc($mdvalue, $value);
@@ -117,20 +117,20 @@ function _ubl_access_rights_from_metadata_evaluate_condition($conditionvalues, $
   return $result;
 }
 
-function _ubl_access_rights_from_metadata_comparator_lowercaseLetterMatch($value1, $value2) {
+function _islandora_conditional_access_rights_comparator_lowercaseLetterMatch($value1, $value2) {
   $v1 = preg_replace('/[^a-z]/', '', strtolower($value1));
   $v2 = preg_replace('/[^a-z]/', '', strtolower($value2));
 
   return ($v1 === $v2);
 }
 
-function _ubl_access_rights_from_metadata_comparator_equals($value1, $value2) {
+function _islandora_conditional_access_rights_comparator_equals($value1, $value2) {
   return ($value1 === $value2);
 }
 
-function _ubl_access_rights_from_metadata_comparator_afterDateISO8601($value1, $value2) {
-  $date1 = _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($value1);  
-  $date2 = _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($value2);  
+function _islandora_conditional_access_rights_comparator_afterDateISO8601($value1, $value2) {
+  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);  
+  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);  
 
   if ($date1 === FALSE || $date2 === FALSE) {
     return FALSE;
@@ -139,9 +139,9 @@ function _ubl_access_rights_from_metadata_comparator_afterDateISO8601($value1, $
   return ($date1 > $date2);
 }
 
-function _ubl_access_rights_from_metadata_comparator_beforeDateISO8601($value1, $value2) {
-  $date1 = _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($value1);  
-  $date2 = _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($value2);  
+function _islandora_conditional_access_rights_comparator_beforeDateISO8601($value1, $value2) {
+  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);  
+  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);  
 
   if ($date1 === FALSE || $date2 === FALSE) {
     return FALSE;
@@ -150,7 +150,7 @@ function _ubl_access_rights_from_metadata_comparator_beforeDateISO8601($value1, 
   return ($date1 < $date2);
 }
 
-function _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($value) {
+function _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value) {
   $matches = array();
   if ($value === 'today') {
     return date("Y-m-d");
@@ -198,7 +198,7 @@ function _ubl_access_rights_from_metadata_comparator_date_ISO8601_normalizer($va
   }
 }
 
-function ubl_access_rights_from_metadata_unfold_dsid_array($cnfg, $key, $obj, $dontmessdsids = array()) {
+function islandora_conditional_access_rights_unfold_dsid_array($cnfg, $key, $obj, $dontmessdsids = array()) {
   if (!isset($cnfg[$key])) {
     return array();
   }       
@@ -218,13 +218,13 @@ function ubl_access_rights_from_metadata_unfold_dsid_array($cnfg, $key, $obj, $d
   return $dsids;
 }     
 
-function ubl_access_rights_from_metadata_accessible_object($obj) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_accessible_object($obj) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+  $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
 
   if (isset($accesssettings['deny_viewing'])) {
     return !$accesssettings['deny_viewing'];
@@ -232,16 +232,16 @@ function ubl_access_rights_from_metadata_accessible_object($obj) {
   return NULL;
 }
 
-function ubl_access_rights_from_metadata_accessible_dsids($obj) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_accessible_dsids($obj) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+  $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
 
-  $accessibledsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
-  $denydsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
+  $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
+  $denydsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
 
   // remove any occurence of allowed dsids if it is in the deny dsids also.
   $accessibledsids = array_diff($accessibledsids, $denydsids);
@@ -249,16 +249,16 @@ function ubl_access_rights_from_metadata_accessible_dsids($obj) {
   return $accessibledsids;
 }
 
-function ubl_access_rights_from_metadata_restricted_dsids($obj) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_restricted_dsids($obj) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+  $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
 
-  $accessibledsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
-  $denydsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
+  $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
+  $denydsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
 
   // remove any occurence of deny dsids if it is in the allowed dsids also.
   $restricteddsids = array_diff($denydsids, $accessibledsids);
@@ -266,18 +266,18 @@ function ubl_access_rights_from_metadata_restricted_dsids($obj) {
   return $restricteddsids;
 }
 
-function ubl_access_rights_from_metadata_downloadable_dsids_with_label($obj) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_downloadable_dsids_with_label($obj) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+  $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
 
-  $downloadabledsids = ubl_access_rights_from_metadata_unfold_dsid_array($accesssettings, 'provide_download_of_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
+  $downloadabledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'provide_download_of_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
 
   $result = array();
-  $dsid2label = ubl_access_rights_from_metadata_dsids_with_labels();
+  $dsid2label = islandora_conditional_access_rights_dsids_with_labels();
   foreach ($downloadabledsids as $downloadabledsid) {
     $label = NULL;
     if (isset($dsid2label[$downloadabledsid])) {
@@ -299,7 +299,7 @@ function ubl_access_rights_from_metadata_downloadable_dsids_with_label($obj) {
   return $result;
 }
 
-function ubl_access_rights_from_metadata_dsids_with_labels() {
+function islandora_conditional_access_rights_dsids_with_labels() {
   return array(
     "MODS"          => t("Descriptive Metadata (MODS)"),
     "DC"            => t("Descriptive Metadata (DC)"),
@@ -328,13 +328,13 @@ function ubl_access_rights_from_metadata_dsids_with_labels() {
   );
 }
 
-function ubl_access_rights_from_metadata_access_description($obj) {
-  module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+function islandora_conditional_access_rights_access_description($obj) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
-  $configlocation = variable_get('ubl_access_rights_from_metadata_config_location');
-  $config = ubl_access_rights_from_metadata_get_configuration($configlocation);
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+  $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
 
   $result = array();
   $result['accesstext'] = isset($accesssettings['access_text'])?$accesssettings['access_text']:'';
@@ -345,22 +345,22 @@ function ubl_access_rights_from_metadata_access_description($obj) {
   return $result;
 }
 
-function ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($obj, $config) {
+function islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config) {
 
   $settings = &drupal_static(__FUNCTION__);
 
   if (!isset($settings[$obj->id])) {
-    module_load_include('inc', 'ubl_access_rights_from_metadata', 'includes/config');
+    module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
   
-    $accesssettings = ubl_access_rights_from_metadata_access_rights_settings_for_object($obj, $config);
+    $accesssettings = islandora_conditional_access_rights_access_rights_settings_for_object($obj, $config);
     if (!empty($accesssettings)) {
       $accesssettings['_source_of_settings'][] = $obj->id;
     }
-    $neededkeys = array_keys(ubl_access_rights_from_metadata_default_settings());
+    $neededkeys = array_keys(islandora_conditional_access_rights_default_settings());
   
     $part_of = NULL;
 
-    if (!ubl_access_rights_from_metadata_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
+    if (!islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
       // Book page?
       $part_of = $obj->relationships->get(ISLANDORA_RELS_EXT_URI, 'isPageOf');
       // Other member?
@@ -378,7 +378,7 @@ function ubl_access_rights_from_metadata_get_access_settings_from_object_or_pare
           $ppid = $part['object']['value'];
           $pobj = islandora_object_load($ppid);
           if ($pobj) {
-            $paccesssettings = ubl_access_rights_from_metadata_get_access_settings_from_object_or_parent($pobj, $config);
+            $paccesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($pobj, $config);
             if (!empty($paccesssettings)) {
               $accesssettings['_source_of_settings'] = array_unique(array_merge($accesssettings['_source_of_settings'], $paccesssettings['_source_of_settings']));
               foreach ($paccesssettings['_conditions_met'] as $pcond => $isaccesscond) {
@@ -387,7 +387,7 @@ function ubl_access_rights_from_metadata_get_access_settings_from_object_or_pare
               $paccesssettings['_reasons'] = $accesssettings['_reasons'] + $paccesssettings['_reasons'];
               $accesssettings['_ip_dependent'] = $accesssettings['_ip_dependent'] || $paccesssettings['_ip_dependent'];
               $accesssettings = $accesssettings + $paccesssettings;
-              if (ubl_access_rights_from_metadata_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
+              if (islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
                 break; 
               }
             }
@@ -395,11 +395,11 @@ function ubl_access_rights_from_metadata_get_access_settings_from_object_or_pare
         }
       }
     }
-    if (!ubl_access_rights_from_metadata_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
-      $defaults = ubl_access_rights_from_metadata_default_settings();
+    if (!islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
+      $defaults = islandora_conditional_access_rights_default_settings();
       $didusedefault = FALSE;
       foreach ($defaults as $defaultkey => $defaultsetting) {
-        $value = variable_get('ubl_access_rights_from_metadata_default_' . $defaultkey);
+        $value = variable_get('islandora_conditional_access_rights_default_' . $defaultkey);
         if (!array_key_exists($defaultkey, $accesssettings) && !empty($value)) {
           $accesssettings[$defaultkey] = $value;
           $didusedefault = TRUE;
@@ -416,7 +416,7 @@ function ubl_access_rights_from_metadata_get_access_settings_from_object_or_pare
   return $settings[$obj->id];
 }
 
-function ubl_access_rights_from_metadata_settings_has_all_needed_keys($accesssettings, $neededkeys) {
+function islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys) {
   if (empty($neededkeys)) {
     return TRUE;
   }
@@ -428,7 +428,7 @@ function ubl_access_rights_from_metadata_settings_has_all_needed_keys($accessset
   return TRUE;
 }
 
-function ubl_access_rights_from_metadata_default_settings() {
+function islandora_conditional_access_rights_default_settings() {
   return array(
     'deny_viewing' => array('title' => t('Deny viewing'), 'description' => t('Deny all viewing access to the whole object, should be TRUE or FALSE.'), 'type' => 'boolean'),
     'deny_access_to_dsid' => array('title' => t('Restricted datastreams'), 'description' => t('Comma seperated list of datastream IDs of datastreams that are restricted.'), 'type' => 'dsids'),

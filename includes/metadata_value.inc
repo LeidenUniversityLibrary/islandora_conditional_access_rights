@@ -5,7 +5,7 @@
  * Retrieve the metadata value from an object, using caching.
  */
 
-function ubl_access_rights_from_metadata_get_metadata_value($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
+function islandora_conditional_access_rights_get_metadata_value($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
   $id2mdvalue = &drupal_static(__FUNCTION__, array());
   $id = $obj->id;
   $lastchangedate = (string)$obj->lastModifiedDate;
@@ -14,7 +14,7 @@ function ubl_access_rights_from_metadata_get_metadata_value($obj, $config, $need
   }
   if (!isset($id2mdvalue[$id][$neededmdkey])) {
     $cachename = $id;
-    $cachebin = 'cache_ubl_access_rights_from_metadata_md_value';
+    $cachebin = 'cache_islandora_conditional_access_rights_md_value';
     if (!$rebuildcache) {
       if ($cache = cache_get($cachename, $cachebin)) {
         $found = $cache->data;
