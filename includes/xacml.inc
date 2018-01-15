@@ -25,11 +25,9 @@
  */
 
 function islandora_conditional_access_rights_xacml_modify_if_needed($obj, $config) {
-  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
-  $accessrightsvalue = islandora_conditional_access_rights_get_access_rights_value($obj, $config);
-
-  $accesssettings = islandora_conditional_access_rights_get_all_access_rights_settings($accessrightsvalue, $config, TRUE, array('deny_access_to_dsid', 'allow_access_to_dsid', 'allow_access_for_role'));
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($object, $config);
 
   if (isset($accesssettings)) {
     islandora_conditional_access_rights_xacml_modify_with_settings($obj, $accesssettings);
@@ -46,8 +44,8 @@ function islandora_conditional_access_rights_xacml_modify_children($obj, $config
       $pages = islandora_paged_content_get_pages($obj);
       foreach ($pages as $pagepid => $pageinfo) {
         $childobj = islandora_object_load($pagepid);
-        $childaccessrightsvalue = islandora_conditional_access_rights_get_access_rights_value($childobj, $config);
-        if (!$childaccessrightsvalue) {
+        $childaccessrightssettings = islandora_conditional_access_rights_access_rights_settings_for_object($childobj, $config);
+        if (!(isset($childaccessrightssettings[) {
           islandora_conditional_access_rights_xacml_modify_with_settings($childobj, $accesssettings);
         }
       }

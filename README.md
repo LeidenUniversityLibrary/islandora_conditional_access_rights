@@ -2,7 +2,7 @@
 
 ## Introduction
 
-Islandora conditional access rights lets you define the access rights of an object from a value of the metadata of that object or of one of its parents.
+Islandora conditional access rights lets you define the access and access rights of an object conditionally. IP range, user role or metadata (of the object or its parents) can affect the access rights of the object.
 Optionally the XACML policy is changed based on the metadata of the object.
 It also defines which datastreams are downloadable.
 

@@ -5,16 +5,11 @@
  * Calculate the access rights settings for a specific object.
  */
 
-function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config, $neededkeys = NULL) {
+function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
 
-  $accessrights = array();
-  
   $conditionconfig = $config['condition'];
   $conditions = array();
-  $reason = array();
-  $conditionsmet = array();
-  $isipdependent = FALSE;
 
   foreach ($conditionconfig as $conditionname => $conditionvalues) {
     $conditions[$conditionname] = _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $conditions, $config);
@@ -22,12 +17,22 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
       $conditionsmet[$conditionname] = FALSE;
     }
   }
-  
+  return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object);
+}  
+
+function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object = NULL) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
+
+  $accessrights = array();
+  $reason = array();
+  $conditionsmet = array();
+  $isipdependent = FALSE;
   $accessconfig = $config['access'];
+
   foreach ($accessconfig as $accessname => $accessvalues) {
     if (isset($conditions[$accessname]) && $conditions[$accessname]) {
       foreach ($accessvalues as $key => $value) {
-        if (!isset($accessrights[$key])) {
+        if ($object && !isset($accessrights[$key])) {
           $reason[$key][$accessname] = $object->id;
         }
       }
@@ -46,16 +51,24 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
 }
 
 function _islandora_conditional_access_rights_is_ip_dependent($conditionname, $config) {
-  $isipdependent = FALSE;
-  if (array_key_exists('ip_range', $config['condition'][$conditionname])) {
-    $isipdependent = TRUE;
+  return _islandora_conditional_access_rights_is_dependent_on('ip_range', $conditionname, $config);
+}
+
+function _islandora_conditional_access_rights_is_user_role_dependent($conditionname, $config) {
+  return _islandora_conditional_access_rights_is_dependent_on('user_role', $conditionname, $config);
+}
+
+function _islandora_conditional_access_rights_is_dependent_on($dependency, $conditionname, $config)
+  $isdependent = FALSE;
+  if (array_key_exists($dependency, $config['condition'][$conditionname])) {
+    $isdependent = TRUE;
   }
-  if (!$isipdependent && array_key_exists('condition', $config['condition'][$conditionname])) {
+  if (!$isdependent && array_key_exists('condition', $config['condition'][$conditionname])) {
     foreach ($config['condition'][$conditionname]['condition'] as $subconditionname) {
-      $isipdependent = $isipdependent || _islandora_conditional_access_rights_is_ip_dependent($subconditionname, $config);
+      $isdependent = $isdependent || _islandora_conditional_access_rights_is_dependent_on($dependency, $subconditionname, $config);
     }
   }
-  return $isipdependent;
+  return $isdependent;
 }
 
 function _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $existingconditions, $config) {
