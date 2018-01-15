@@ -18,7 +18,7 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
     }
   }
   return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object);
-}  
+}
 
 function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object = NULL) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
@@ -58,7 +58,7 @@ function _islandora_conditional_access_rights_is_user_role_dependent($conditionn
   return _islandora_conditional_access_rights_is_dependent_on('user_role', $conditionname, $config);
 }
 
-function _islandora_conditional_access_rights_is_dependent_on($dependency, $conditionname, $config)
+function _islandora_conditional_access_rights_is_dependent_on($dependency, $conditionname, $config) {
   $isdependent = FALSE;
   if (array_key_exists($dependency, $config['condition'][$conditionname])) {
     $isdependent = TRUE;

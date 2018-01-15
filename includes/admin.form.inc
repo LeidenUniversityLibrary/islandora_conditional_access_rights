@@ -67,7 +67,9 @@ function islandora_conditional_access_rights_admin_form(array $form, array &$for
   foreach ($defaults as $defaultkey => $defaultsetting) {
     $default = variable_get('islandora_conditional_access_rights_default_' . $defaultkey, '');
     if ($defaultsetting['type'] === 'dsids') {
-      $default = implode(',', $default);
+      if (isset($default) && is_array($default)) {
+        $default = implode(',', $default);
+      }
     }
     elseif ($defaultsetting['type'] === 'boolean') {
       if ($default !== '') {

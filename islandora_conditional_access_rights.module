@@ -35,8 +35,8 @@ define('ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_FOR_OBJECT_PERMISSION', 'Islandora c
 function islandora_conditional_access_rights_init() {
   $tnaccessrestricted = variable_get('islandora_conditional_access_rights_tn_url');
   if ($tnaccessrestricted) {
-    drupal_add_js(array('islandora_conditional_access_rights' => array('tn_access_restricted' => $tnaccessrestricted)), array('type' => 'setting'));
-    drupal_add_js(drupal_get_path('module', 'islandora_conditional_access_rights') . '/js/islandora_conditional_access_rights.js');
+    drupal_add_js(array('conditional_access_rights' => array('tn_access_restricted' => $tnaccessrestricted)), array('type' => 'setting'));
+    drupal_add_js(drupal_get_path('module', 'islandora_conditional_access_rights') . '/js/conditional_access_rights.js');
   }
 }
 
