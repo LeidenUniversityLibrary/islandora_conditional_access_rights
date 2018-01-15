@@ -42,7 +42,6 @@ function islandora_conditional_access_rights_admin_form(array $form, array &$for
     $config_location = variable_get('islandora_conditional_access_rights_config_location');
   }
   $tn_url = variable_get('islandora_conditional_access_rights_tn_url');
-  $enable_xacml = variable_get('islandora_conditional_access_rights_enable_xacml', FALSE);
   $defaults = islandora_conditional_access_rights_default_settings();
 
   $form['config'] = array(
@@ -60,12 +59,6 @@ function islandora_conditional_access_rights_admin_form(array $form, array &$for
     '#title' => t('Access restricted thumbnail URL'),
     '#description' => t('A URL (absolute or relative to the server) of a thumbnail to use when the current item is not accessible by the user.'),
     '#default_value' => $tn_url,
-  );
-  $form['config']['enable_xacml'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Enable XACML'),
-    '#description' => t('Also changes the XACML based on the metadata. Enable this if users can get to content via Fedora.'),
-    '#default_value' => $enable_xacml,
   );
   $form['config']['defaults'] = array(
     '#type' => 'fieldset',
@@ -139,7 +132,6 @@ function islandora_conditional_access_rights_admin_form_submit(array $form, arra
 
   $oldconfiglocation = variable_get('islandora_conditional_access_rights_config_location');
   variable_set('islandora_conditional_access_rights_config_location', $form_state['values']['location']);
-  variable_set('islandora_conditional_access_rights_enable_xacml', $form_state['values']['enable_xacml']);
   variable_set('islandora_conditional_access_rights_tn_url', $form_state['values']['tn_url']);
   if ($oldconfiglocation) {
     islandora_conditional_access_rights_refresh_configuration($oldconfiglocation);

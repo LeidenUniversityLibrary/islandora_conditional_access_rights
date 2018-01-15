@@ -263,31 +263,6 @@ function _islandora_conditional_access_rights_islandora_datastream_access_on_obj
   return NULL;
 }
 
-
-/**
- * Implements hook_islandora_datastream_modified().
- **/
-function islandora_conditional_access_rights_islandora_datastream_modified(AbstractObject $object, AbstractDatastream $datastream) {
-  if ($object && $datastream) {
-    $configlocation = variable_get('islandora_conditional_access_rights_config_location'); 
-    if (!$configlocation) {
-      return;
-    }
-
-    module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
-
-    $config = islandora_conditional_access_rights_get_configuration($configlocation);
-    if (isset($config['_config']['rightssource']['dsid']) && $datastream->id === $config['_config']['rightssource']['dsid']) {
-      module_load_include('inc', 'islandora_conditional_access_rights', 'includes/xacml');
-     
-      if (variable_get('islandora_conditional_access_rights_enable_xacml', FALSE)) {
-        // Set XACML rights according to configuration.
-        islandora_conditional_access_rights_xacml_modify_if_needed($object, $config);
-      }
-    }
-  }
-}
-
 /**
  * Implements hook_flush_caches().
  */

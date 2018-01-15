@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Functions for batch changing the XACML policy of objects.
+ * Functions for batch checking the access rights settings of objects.
  *
  *
  *  Copyright 2017 Leiden University Library
@@ -27,19 +27,6 @@
  * Implements hook_drush_command().
  */
 function islandora_conditional_access_rights_drush_command() {
-  $items['change_xacml_policy_based_on_metadata'] = array(
-    'description' => 'Change the XACML policy based on the metadata of the objects. An absolute path to a configuration directory with ini files or a single ini file should be supplied. Also a collection ID is mandatory.',
-    'options' => array(
-      'collection' => 'Mandatory, one collection ID.',
-      'configuration' => 'Mandatory, the absolute filepath to an ini file.',
-    ),
-    'aliases' => array('cxpbomd'),
-    'examples' => array(
-      'drush --user=admin change_xacml_policy_based_on_metadata --collection=islandora:root --configuration=/path/to/a/ini/file',
-      'drush --user=admin change_xacml_policy_based_on_metadata --collection=islandora:root --configuration=/url/to/a/ini/file',
-      'drush --user=admin cxpbomd --collection=islandora:root --configuration=/url/to/a/ini/file',
-    ),
-  );
   $items['check_access_rights_settings'] = array(
     'description' => 'Check the access rights settings of the children of a specific collection.',
     'options' => array(
@@ -61,7 +48,7 @@ function islandora_conditional_access_rights_drush_command() {
 /**
  * Implements drush_hook_COMMAND_validate().
  */
-function drush_islandora_conditional_access_rights_change_xacml_policy_based_on_metadata_validate() {
+function drush_islandora_conditional_access_rights_check_access_rights_settings_validate() {
   return _islandora_conditional_access_rights_validate_collection_configuration();
 }
 
@@ -92,46 +79,6 @@ function _islandora_conditional_access_rights_validate_collection_configuration(
   }
  
   return TRUE;
-}
-
-/**
- * Implements drush_hook_COMMAND().
- */
-function drush_islandora_conditional_access_rights_change_xacml_policy_based_on_metadata() {
-  module_load_include('inc', 'islandora', 'includes/utilities');
-  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
-  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/xacml');
-  module_load_include('inc', 'islandora_xacml_api', 'includes/islandora_xacml');
-
-  if (!variable_get('islandora_conditional_access_rights_enable_xacml', FALSE)) {
-    if (!drush_confirm('XACML policy updates are disabled in admin/islandora/tools/islandora_conditional_access_rights. Are you sure you want to continue?')) {
-      drush_log('Stopped');
-      return;
-    }
-  }
-
-  $configlocation = drush_get_option('configuration');
-  $collection = drush_get_option('collection');
-
-  $collectionobj = islandora_object_load($collection);
-  $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  if ($collectionobj && in_array('islandora:collectionCModel', $collectionobj->models)) {
-    list($count, $colobjs) = islandora_basic_collection_get_member_objects($collectionobj, -1, -1);
-    foreach ($colobjs as $colobj) {
-      $cid = $colobj['object']['value'];
-      $cobj = islandora_object_load($cid);
-      if ($cobj) { 
-        islandora_conditional_access_rights_xacml_modify_if_needed($cobj, $config); 
-      }
-    }
-  }
-}
-
-/**
- * Implements drush_hook_COMMAND_validate().
- */
-function drush_islandora_conditional_access_rights_check_access_rights_settings_validate() {
-  return _islandora_conditional_access_rights_validate_collection_configuration();
 }
 
 /**

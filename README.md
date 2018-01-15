@@ -3,7 +3,6 @@
 ## Introduction
 
 Islandora conditional access rights lets you define the access and access rights of an object conditionally. IP range, user role or metadata (of the object or its parents) can affect the access rights of the object.
-Optionally the XACML policy is changed based on the metadata of the object.
 It also defines which datastreams are downloadable.
 
 ## Requirements
@@ -20,12 +19,6 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 At `admin/islandora/tools/access_rights` the configuration location can be defined. This should be an absolute file path
 or a URL to the configuration file. See 'ini file' for more information.
-
-The 'Enable XACML' checkbox enables the modification of the XACML policy of the object whose metadata has changed. This is only useful if the
-objects can be accessed directly inside Fedora and you want to have access rights in Fedora as well. However, this will have some drawbacks,
-because everytime the metadata changes, potentially the XACML policy of the object (and all of its children!) is changed as well.
-If you only access your objects through Drupal, there is no need to enable XACML restrictions.
-PLEASE NOTE: IP range restrictions can only be enforced through Drupal/Islandora and not through XACML policies, so these will never have XACML policies.
 
 ### ini file
 
@@ -100,17 +93,6 @@ Because this module also provides a download button, the code below should be in
 ```
 
 ## drush commands
-
-### change\_xacml\_policy\_based\_on\_metadata
-
-Change the XACML policy based on the metadata of the objects. An absolute path to a configuration directory with ini files or a single ini file should be supplied. Also a collection ID is mandatory.
-This will give a warning when 'Enable XML' is off.
-
-```
-drush --user=admin change_xacml_policy_based_on_metadata --collection=islandora:root --configuration=/path/to/a/ini/file
-drush --user=admin change_xacml_policy_based_on_metadata --collection=islandora:root --configuration=/url/to/a/ini/file
-drush --user=admin cxpbomd --collection=islandora:root --configuration=/url/to/a/ini/file
-```
 
 ### check\_access\_rights\_settings
 
