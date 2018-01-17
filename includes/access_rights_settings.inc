@@ -139,6 +139,10 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
   return $result;
 }
 
+function _islandora_conditional_access_rights_comparator_contains($value1, $value2) {
+  return ((strpos($value1, $value2) !== FALSE) || (strpos($value2, $value1) != FALSE));
+}
+
 function _islandora_conditional_access_rights_comparator_lowercaseLetterMatch($value1, $value2) {
   $v1 = preg_replace('/[^a-z0-9]/', '', strtolower($value1));
   $v2 = preg_replace('/[^a-z0-9]/', '', strtolower($value2));
