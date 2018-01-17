@@ -5,7 +5,7 @@
  * Retrieve the metadata value from an object, using caching.
  */
 
-function islandora_conditional_access_rights_get_metadata_value($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
+function islandora_conditional_access_rights_get_metadata_values($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
   $id2mdvalue = &drupal_static(__FUNCTION__, array());
   $id = $obj->id;
   $lastchangedate = (string)$obj->lastModifiedDate;
@@ -50,7 +50,10 @@ function islandora_conditional_access_rights_get_metadata_value($obj, $config, $
               foreach ($domnodelist as $domnode) {
                 $text = $domnode->textContent;
                 if (isset($text) && strlen($text) > 0) {
-                  $id2mdvalue[$id][$mdkey] = $text;
+                  if (!isset($id2mdvalue[$id][$mdkey])) {
+                    $id2mdvalue[$id][$mdkey] = array();
+                  }
+                  $id2mdvalue[$id][$mdkey][] = $text;
                 }
               }
             }

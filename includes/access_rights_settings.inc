@@ -78,13 +78,22 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
     $operator = $conditionvalues['operator'];
   }
   if (isset($conditionvalues['metadata'], $conditionvalues['comparator'], $conditionvalues['value'])) {
-    $mdvalue = islandora_conditional_access_rights_get_metadata_value($object, $config, $conditionvalues['metadata']); 
+    $mdvalues = islandora_conditional_access_rights_get_metadata_values($object, $config, $conditionvalues['metadata']); 
     $comparator = $conditionvalues['comparator'];
     $value = $conditionvalues['value'];
     $prefix = '_islandora_conditional_access_rights_comparator_';
     $compfunc = $prefix . $comparator;
+    $result = FALSE;
 
-    $results[] = $compfunc($mdvalue, $value);
+    if (is_array($mdvalues)) {
+      foreach ($mdvalues as $mdvalue) {
+        $result = $compfunc($mdvalue, $value);
+        if ($result) {
+          break;
+        }
+      }
+    }
+    $results[] = $result;
   }
   if (isset($conditionvalues['user_role'])) {
     global $user;
