@@ -17,15 +17,14 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
       $conditionsmet[$conditionname] = FALSE;
     }
   }
-  return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object);
+  return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object);
 }
 
-function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $object = NULL) {
+function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object = NULL) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
 
   $accessrights = array();
   $reason = array();
-  $conditionsmet = array();
   $isipdependent = FALSE;
   $accessconfig = $config['access'];
 
