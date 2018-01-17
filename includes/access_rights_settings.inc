@@ -397,7 +397,7 @@ function islandora_conditional_access_rights_get_access_settings_from_object_or_
               foreach ($paccesssettings['_conditions_met'] as $pcond => $isaccesscond) {
                 $accesssettings['_conditions_met'][$pcond] = (isset($accesssettings['_conditions_met'][$pcond]) && $accesssettings['_conditions_met'][$pcond]) || $isaccesscond;
               }
-              $paccesssettings['_reasons'] = $accesssettings['_reasons'] + $paccesssettings['_reasons'];
+              $accesssettings['_reasons'] = $accesssettings['_reasons'] + $paccesssettings['_reasons'];
               $accesssettings['_ip_dependent'] = $accesssettings['_ip_dependent'] || $paccesssettings['_ip_dependent'];
               $accesssettings = $accesssettings + $paccesssettings;
               if (islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
