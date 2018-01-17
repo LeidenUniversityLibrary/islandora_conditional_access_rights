@@ -140,8 +140,8 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
 }
 
 function _islandora_conditional_access_rights_comparator_lowercaseLetterMatch($value1, $value2) {
-  $v1 = preg_replace('/[^a-z]/', '', strtolower($value1));
-  $v2 = preg_replace('/[^a-z]/', '', strtolower($value2));
+  $v1 = preg_replace('/[^a-z0-9]/', '', strtolower($value1));
+  $v2 = preg_replace('/[^a-z0-9]/', '', strtolower($value2));
 
   return ($v1 === $v2);
 }
