@@ -184,11 +184,21 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
  **/
 function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
   if ($hook === 'islandora_book_book') {
-    // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range... do it here...
+    // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range... 
+    // do it here... but only if book is IP range dependent.
     if (isset($variables['object']) && isset($variables['viewer_id'])) {
+      $configlocation = variable_get('islandora_conditional_access_rights_config_location');
+      if (!$configlocation) {
+        return NULL;
+      }
       module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
       $object = $variables['object'];
+      $config = islandora_conditional_access_rights_get_configuration($configlocation);
+      $settings = islandora_conditional_access_rights_access_rights_settings_for_object($object, $config);
+      if (!(isset($settings['_ip_dependent']) && $settings['_ip_dependent'])) {
+        return;
+      }
 
       $pages = $variables['viewer_params']['pages'];
       $newpages = array();
