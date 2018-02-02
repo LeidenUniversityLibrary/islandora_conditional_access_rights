@@ -52,6 +52,7 @@
   };
   $(document).ready(function() {
     $('.islandora-solr-search-result IMG').on("error", replaceInaccessibleThumbnail);
+    $('.islandora-solr-grid .solr-grid-thumb IMG').on("error", replaceInaccessibleThumbnail);
     $('.islandora-object-thumb IMG').on("error", replaceInaccessibleThumbnail);
     $('.islandora-compound-thumbs .dc-grid-item IMG').on("error", replaceInaccessibleThumbnail);
   });
