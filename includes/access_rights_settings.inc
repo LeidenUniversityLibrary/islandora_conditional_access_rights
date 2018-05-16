@@ -5,7 +5,7 @@
  * Calculate the access rights settings for a specific object.
  */
 
-function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config) {
+function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
 
   $conditionconfig = $config['condition'];
@@ -17,10 +17,10 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
       $conditionsmet[$conditionname] = FALSE;
     }
   }
-  return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object);
+  return islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object, $disregard);
 }
 
-function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object = NULL) {
+function islandora_conditional_access_rights_access_rights_settings_for_conditions($conditions, $config, $conditionsmet, $object = NULL, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/metadata_value');
 
   $accessrights = array();
@@ -30,16 +30,18 @@ function islandora_conditional_access_rights_access_rights_settings_for_conditio
 
   foreach ($accessconfig as $accessname => $accessvalues) {
     if (isset($conditions[$accessname]) && $conditions[$accessname]) {
+      if (!(isset($disregard[$accessname]) && $disregard[$accessname])) {
       foreach ($accessvalues as $key => $value) {
         if ($object && !isset($accessrights[$key])) {
           $reason[$key][$accessname] = $object->id;
         }
       }
-      $accessrights = $accessrights + $accessvalues;
-      $conditionsmet[$accessname] = TRUE;
-      if (!$isipdependent && _islandora_conditional_access_rights_is_ip_dependent($accessname, $config)) {
-        $isipdependent = TRUE;
+        $accessrights = $accessrights + $accessvalues;
+        if (!$isipdependent && _islandora_conditional_access_rights_is_ip_dependent($accessname, $config)) {
+          $isipdependent = TRUE;
+        }
       }
+      $conditionsmet[$accessname] = TRUE;
     }
   }
   $accessrights['_conditions_met'] = $conditionsmet;
@@ -243,13 +245,13 @@ function islandora_conditional_access_rights_unfold_dsid_array($cnfg, $key, $obj
   return $dsids;
 }     
 
-function islandora_conditional_access_rights_accessible_object($obj) {
+function islandora_conditional_access_rights_accessible_object($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   if (isset($accesssettings['deny_viewing'])) {
     return !$accesssettings['deny_viewing'];
@@ -257,13 +259,13 @@ function islandora_conditional_access_rights_accessible_object($obj) {
   return NULL;
 }
 
-function islandora_conditional_access_rights_accessible_dsids($obj) {
+function islandora_conditional_access_rights_accessible_dsids($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
   $denydsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
@@ -274,13 +276,13 @@ function islandora_conditional_access_rights_accessible_dsids($obj) {
   return $accessibledsids;
 }
 
-function islandora_conditional_access_rights_restricted_dsids($obj) {
+function islandora_conditional_access_rights_restricted_dsids($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
   $denydsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'deny_access_to_dsid', $obj);
@@ -291,13 +293,13 @@ function islandora_conditional_access_rights_restricted_dsids($obj) {
   return $restricteddsids;
 }
 
-function islandora_conditional_access_rights_downloadable_dsids_with_label($obj) {
+function islandora_conditional_access_rights_downloadable_dsids_with_label($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $downloadabledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'provide_download_of_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
 
@@ -353,13 +355,13 @@ function islandora_conditional_access_rights_dsids_with_labels() {
   );
 }
 
-function islandora_conditional_access_rights_access_description($obj) {
+function islandora_conditional_access_rights_access_description($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
   
-  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config);
+  $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $result = array();
   $result['accesstext'] = isset($accesssettings['access_text'])?$accesssettings['access_text']:'';
@@ -370,14 +372,14 @@ function islandora_conditional_access_rights_access_description($obj) {
   return $result;
 }
 
-function islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config) {
+function islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard = array()) {
 
   $settings = &drupal_static(__FUNCTION__);
 
-  if (!isset($settings[$obj->id])) {
+  if (!isset($settings[$obj->id]) || !empty($disregard)) {
     module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
   
-    $accesssettings = islandora_conditional_access_rights_access_rights_settings_for_object($obj, $config);
+    $accesssettings = islandora_conditional_access_rights_access_rights_settings_for_object($obj, $config, $disregard);
     if (!empty($accesssettings)) {
       $accesssettings['_source_of_settings'][] = $obj->id;
     }
@@ -403,7 +405,7 @@ function islandora_conditional_access_rights_get_access_settings_from_object_or_
           $ppid = $part['object']['value'];
           $pobj = islandora_object_load($ppid);
           if ($pobj) {
-            $paccesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($pobj, $config);
+            $paccesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($pobj, $config, $disregard);
             if (!empty($paccesssettings)) {
               $accesssettings['_source_of_settings'] = array_unique(array_merge($accesssettings['_source_of_settings'], $paccesssettings['_source_of_settings']));
               foreach ($paccesssettings['_conditions_met'] as $pcond => $isaccesscond) {
@@ -435,7 +437,12 @@ function islandora_conditional_access_rights_get_access_settings_from_object_or_
         $accesssettings['_source_of_settings'][] = 'default';
       }
     }
-    $settings[$obj->id] = $accesssettings;
+    if (empty($disregard)) {
+      $settings[$obj->id] = $accesssettings;
+    }
+    else {
+      return $accesssettings;
+    }
   }
 
   return $settings[$obj->id];

@@ -39,8 +39,19 @@ function access_rights_view_form(array $form, array &$form_state, AbstractObject
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   if ($configlocation) {
+    $disregard = array();
+
+    if (isset($form_state["input"]["conditionsmet"])) {
+      $conditionsmet = explode(',', $form_state["input"]["conditionsmet"]);
+      foreach ($conditionsmet as $cond) {
+        $cwop = str_replace('.', '_', $cond);
+        if (!isset($form_state["input"][$cwop]) || ($form_state["input"][$cwop] !== 'on')) {
+          $disregard[$cond] = TRUE;
+        }
+      }
+    }
     $config = islandora_conditional_access_rights_get_configuration($configlocation);
-    $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($object, $config); 
+    $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($object, $config, $disregard);
 
     $table = '<TR><TH>' . t('Conditions met') . '</TH><TD>';
     if(empty($accesssettings['_conditions_met'])) {
@@ -48,35 +59,41 @@ function access_rights_view_form(array $form, array &$form_state, AbstractObject
     }
     else {
       foreach ($accesssettings['_conditions_met'] as $cond => $isaccesscond) {
+        $cwop = str_replace('.', '_', $cond);
         if ($isaccesscond) {
-          $table .= '<strong>' . $cond . '</strong>';
+          $table .= '<strong>' . '<input type="checkbox" name="' . $cwop . '" onchange="this.form.submit();"';
+          if (!isset($form_state["input"]["conditionsmet"]) || (isset($form_state["input"][$cwop]) && ($form_state["input"][$cwop] === 'on'))) {
+            $table .= ' checked';
+          }
+          $table .= '> ' . $cond . '</strong>';
         }
         else {
-          $table .= $cond;
+          $table .= '<input type="checkbox" name="' . $cond . '" checked disabled> ' . $cond;
         }
-        $table .= ' ';
+        $table .= '</BR>';
       }
+      $table .= '<INPUT type="hidden" name="conditionsmet" value="' . implode(',', array_keys($accesssettings['_conditions_met'])) . '">';
     } 
     $table .= '</TD></TR>';
 
-    $accessible = islandora_conditional_access_rights_accessible_object($object);
+    $accessible = islandora_conditional_access_rights_accessible_object($object, $disregard);
     $accessible = (($accessible !== NULL)?($accessible?"FALSE":"TRUE"):'<em>' . t('Undefined') . '</em>');
     $accessible .= ' ' . _access_rights_view_reason($accesssettings, 'deny_viewing', $object->id);
     $table .= '<TR><TH>' . t('Deny viewing') . '</TH><TD>' . $accessible . '</TD></TR>';
 
-    $accessible = islandora_conditional_access_rights_accessible_dsids($object);
+    $accessible = islandora_conditional_access_rights_accessible_dsids($object, $disregard);
     $accessible = (count($accessible) > 0)?implode(', ', $accessible):'<em>' . t('None') . '</em>';
     $accessible .= ' ' . _access_rights_view_reason($accesssettings, 'allow_access_to_dsid', $object->id);
     $table .= '<TR><TH>' . t('Accessible datastreams') . '</TH><TD>' . $accessible . '</TD></TR>';
      
     $fromobjid = '';
-    $restricted = islandora_conditional_access_rights_restricted_dsids($object);
+    $restricted = islandora_conditional_access_rights_restricted_dsids($object, $disregard);
     $restricted = (count($restricted) > 0)?implode(', ', $restricted):'<em>' . t('None') . '</em>';
     $restricted .= ' ' . _access_rights_view_reason($accesssettings, 'deny_access_to_dsid', $object->id);
     $table .= '<TR><TH>' . t('Restricted datastreams') . '</TH><TD>' . $restricted . '</TD></TR>';
      
     $fromobjid = '';
-    $downloadable = islandora_conditional_access_rights_downloadable_dsids_with_label($object);
+    $downloadable = islandora_conditional_access_rights_downloadable_dsids_with_label($object, $disregard);
     $table .= '<TR><TH>' . t('Downloadable datastreams') . '</TH>';
     if (count($downloadable) > 0) {
       $table .= '<TD>';
@@ -94,7 +111,7 @@ function access_rights_view_form(array $form, array &$form_state, AbstractObject
     $table .= '</TR>';
 
     $fromobjid = '';
-    $accessdesc = islandora_conditional_access_rights_access_description($object);
+    $accessdesc = islandora_conditional_access_rights_access_description($object, $disregard);
     $from = _access_rights_view_reason($accesssettings, 'access_text', $object->id);
     $table .= '<TR><TH>' . t('Access text') . '</TH><TD>' . $accessdesc['accesstext'] . $from . '</TD></TR>';
     $from = _access_rights_view_reason($accesssettings, 'access_usetext', $object->id);
