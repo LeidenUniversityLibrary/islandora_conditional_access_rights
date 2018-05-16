@@ -119,7 +119,7 @@ function access_rights_view_form(array $form, array &$form_state, AbstractObject
     $from = _access_rights_view_reason($accesssettings, 'access_link', $object->id);
     $table .= '<TR><TH>' . t('Access link') . '</TH><TD>' . $accessdesc['accesslink'] . $from . '</TD></TR>';
     $from = _access_rights_view_reason($accesssettings, 'access_image', $object->id);
-    $table .= '<TR><TH>' . t('Access image') . '</TH><TD>' . $accessdesc['accessimage'] . $from . '</TD></TR>';
+    $table .= '<TR><TH>' . t('Access image') . '</TH><TD><IMG src="' . $accessdesc['accessimage'] .'" style="max-height:2em;"/> ' . $accessdesc['accessimage'] . $from . '</TD></TR>';
     $ipdependent = (isset($accesssettings['_ip_dependent']) && $accesssettings['_ip_dependent'])?t('yes'):t('no');
     $table .= '<TR><TH>' . t('IP dependent') . '</TH><TD>' . $ipdependent . ' (current ip address is: ' . ip_address() . ')</TD></TR>';
   }
