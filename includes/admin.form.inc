@@ -141,7 +141,12 @@ function islandora_conditional_access_rights_admin_form_submit(array $form, arra
   $defaults = islandora_conditional_access_rights_default_settings();
   foreach ($defaults as $defaultkey => $defaultsetting) {
     if ($defaultsetting['type'] === 'dsids') {
-      variable_set('islandora_conditional_access_rights_default_' . $defaultkey, explode(',', $form_state['values'][$defaultkey]));
+      if ($form_state['values'][$defaultkey] === '') {
+        variable_del('islandora_conditional_access_rights_default_' . $defaultkey);
+      }
+      else {
+        variable_set('islandora_conditional_access_rights_default_' . $defaultkey, explode(',', $form_state['values'][$defaultkey]));
+      }
     }
     elseif ($defaultsetting['type'] === 'boolean') {
       if ($form_state['values'][$defaultkey] === '') {
