@@ -66,6 +66,7 @@ function _islandora_conditional_access_rights_valid_config_content($inicontent, 
       $optional = array(
         'user_role' => array(),
         'ip_range' => array(),
+        'content_model' => array(),
         'condition' => array(),
         'operator' => '/^(negate|and|or)$/',
         'metadata' => '',

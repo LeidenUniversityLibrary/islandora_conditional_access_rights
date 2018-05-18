@@ -31,11 +31,11 @@ function islandora_conditional_access_rights_access_rights_settings_for_conditio
   foreach ($accessconfig as $accessname => $accessvalues) {
     if (isset($conditions[$accessname]) && $conditions[$accessname]) {
       if (!(isset($disregard[$accessname]) && $disregard[$accessname])) {
-      foreach ($accessvalues as $key => $value) {
-        if ($object && !isset($accessrights[$key])) {
-          $reason[$key][$accessname] = $object->id;
+        foreach ($accessvalues as $key => $value) {
+          if ($object && !isset($accessrights[$key])) {
+            $reason[$key][$accessname] = $object->id;
+          }
         }
-      }
         $accessrights = $accessrights + $accessvalues;
         if (!$isipdependent && _islandora_conditional_access_rights_is_ip_dependent($accessname, $config)) {
           $isipdependent = TRUE;
@@ -116,6 +116,9 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
       }
     }
     $results[] = $isinrange; 
+  }
+  if (isset($conditionvalues['content_model'])) {
+    $results[] = (count(array_intersect($object->models, $conditionvalues['content_model'])) > 0);
   }
   if (isset($conditionvalues['condition'])) {
     foreach ($conditionvalues['condition'] as $conditionname) {

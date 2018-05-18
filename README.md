@@ -48,6 +48,7 @@ This part should contain 1 or more sections. Each section is named "condition:ke
 A "condition:" section can contain a combination of the following keys:
  * `user_role`: the name of the user role. If the user with this role is logged on, this condition is met. (multiple values, optional)
  * `ip_range`: if the users IP falls in this range, the condition is met. A range should be defined like 1.1.1.1-2.2.2.2, IPv4 and IPv6 are supported. (multiple values, optional)
+ * `content_model`: if the objects content model is the same is this, then this condition is met. (multiple values, optional)
  * condition: use this to combine previously defined conditions, the "operator" key defines how these conditions should be combined. (multiple values, optional)
  * operator: if combined with key "condition" this can have the following value: "and" (all conditions should be met), "or" (any condition should be met) or "negate" (disproves the condition). (optional)
  * metadata: use together with comparator and value. This value should be defined as a "metadata:" section. (optional)
