@@ -77,8 +77,15 @@ function _islandora_conditional_access_rights_get_solr_values($obj, $solrfield) 
   static $qpc = 0;
   static $solrresults = array();
 
-  if (isset($solrresults[$obj->id][$solrfield])) {
-    return $solrresults[$obj->id][$solrfield];
+  $value = NULL;
+
+  if (isset($solrresults[$obj->id])) {
+    if (isset($solrresults[$obj->id][$solrfield])) {
+      return $solrresults[$obj->id][$solrfield];
+    }
+    else {
+      return NULL;
+    }
   }
 
   if (is_null($qp) || $qpc > 10) {
@@ -103,8 +110,20 @@ function _islandora_conditional_access_rights_get_solr_values($obj, $solrfield) 
       if (!is_array($value)) {
         $value = array($value);
       }
-      return $value;
     }
   }
-  return NULL;
+
+  // cache member objects if any
+  $prefix = islandora_solr_lesser_escape("info:fedora/");
+  $search = "RELS_EXT_isMemberOf_uri_s:$prefix$escapedid";
+  $qp->buildAndExecuteQuery($search, NULL, FALSE);
+  $r = $qp->islandoraSolrResult;
+  $num_found = $r['response']['numFound'];
+  if ($num_found > 0) {
+    foreach ($r['response']['objects'] as $doc) {
+      $solrresults[$doc['PID']] = $doc['solr_doc'];
+    }
+  }
+
+  return $value;
 }
