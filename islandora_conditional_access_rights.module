@@ -195,8 +195,13 @@ function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
 
       $object = $variables['object'];
       $config = islandora_conditional_access_rights_get_configuration($configlocation);
-      $settings = islandora_conditional_access_rights_access_rights_settings_for_object($object, $config);
+      $settings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($object, $config);
       if (!(isset($settings['_ip_dependent']) && $settings['_ip_dependent'])) {
+        if (isset($settings['deny_access_to_dsid'])) {
+          if (in_array('ALL', $settings['deny_access_to_dsid']) || in_array('JP2', $settings['deny_access_to_dsid'])) {
+            $variables['viewer_id'] = NULL;
+          }
+        }
         return;
       }
 
