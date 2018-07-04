@@ -55,7 +55,7 @@ function _islandora_conditional_access_rights_valid_config_content($inicontent, 
     $sectionname = $keyparts[1];
     if (has_prefix($key, 'metadata:')) {
       $mandatory = array('datastream' => '/^[A-Z0-9]+$/', 'xpath' => '');
-      $optional = array('namespace' => array(), 'solrfield' => '');
+      $optional = array('namespace' => array());
       if (!_islandora_conditional_access_rights_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
         return FALSE;
       }
