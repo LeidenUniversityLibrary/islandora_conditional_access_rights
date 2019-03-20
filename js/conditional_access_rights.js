@@ -36,7 +36,9 @@
         return;
       }
       var parts = img.src.split("?", 2);
-      if (parts[0].endsWith('datastream/TN/view') || parts[0].endsWith('islandora/images/folder.png')) {
+      var isThumb = (parts[0].endsWith('datastream/TN/view') || parts[0].endsWith('islandora/images/folder.png'));
+      isThumb = isThumb || (parts[0].indexOf('islandora_imagecache') !== -1);
+      if (isThumb) {
         var newsrc = tnurl;
         if (parts.length == 2) {
           newsrc += '?' + parts[1];
