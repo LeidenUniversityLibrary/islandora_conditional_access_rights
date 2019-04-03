@@ -318,3 +318,20 @@ function islandora_conditional_access_rights_boot() {
     }
   }
 }
+
+/**
+ * Implements hook_islandora_imagecache_default_icon_alter.
+ * Alter the default Thumbnail used by islandora imageacache.
+ *
+ * @param string $themed_image
+ *   The url to the styled image.
+ * @param string $style
+ *   The image style machine name.
+ */
+function islandora_conditional_access_rights_islandora_imagecache_default_icon_alter(&$themed_image, &$style) {
+  // Use the tn_restricted_access.gif from this module.
+  $dir = drupal_get_path('module', 'islandora_conditional_access_rights');
+  $path = file_create_url("$dir/images/tn_restricted_access.gif");
+  $uri = imagecache_external_generate_path($path);
+  $themed_image = image_style_url($style, $uri);
+}
