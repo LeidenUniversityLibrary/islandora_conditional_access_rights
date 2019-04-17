@@ -229,6 +229,8 @@ function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
  **/
 function islandora_conditional_access_rights_islandora_object_access($op, $object, $user) {
   if ($op === ISLANDORA_VIEW_OBJECTS) {
+module_load_include('module', 'islandora_bottleneck_spotter');
+_islandora_bottleneck_spotter_mark('icar obj access start', NULL, $object->id);
     $configlocation = variable_get('islandora_conditional_access_rights_config_location');
     if (!$configlocation) {
       return NULL;
@@ -236,7 +238,10 @@ function islandora_conditional_access_rights_islandora_object_access($op, $objec
 
     module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
-    return islandora_conditional_access_rights_accessible_object($object);
+    $result = islandora_conditional_access_rights_accessible_object($object);
+
+_islandora_bottleneck_spotter_mark('icar obj access end', array('icar obj access start' => 'ds access'));
+    return $result;
   }
   return NULL;
 }
@@ -246,6 +251,8 @@ function islandora_conditional_access_rights_islandora_object_access($op, $objec
  **/
 function islandora_conditional_access_rights_islandora_datastream_access($op, $islandora_datastream, $user) {
   if ($op === ISLANDORA_VIEW_OBJECTS) {
+module_load_include('module', 'islandora_bottleneck_spotter');
+_islandora_bottleneck_spotter_mark('icar ds access start', NULL, $islandora_datastream->id . '@' . $islandora_datastream->parent->id);
     $configlocation = variable_get('islandora_conditional_access_rights_config_location');
     if (!$configlocation) {
       return NULL;
@@ -254,7 +261,9 @@ function islandora_conditional_access_rights_islandora_datastream_access($op, $i
     $obj = $islandora_datastream->parent;
     $dsid = $islandora_datastream->id;
   
-    return _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user);
+    $result = _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user);
+_islandora_bottleneck_spotter_mark('icar ds access end', array('icar ds access start' => 'ds access'));
+    return $result;
   }
   return NULL;
 }

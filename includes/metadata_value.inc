@@ -6,6 +6,8 @@
  */
 
 function islandora_conditional_access_rights_get_metadata_values($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
+module_load_include('module', 'islandora_bottleneck_spotter');
+_islandora_bottleneck_spotter_mark('icar md start', NULL, $obj->id);
   $id2mdvalue = &drupal_static(__FUNCTION__, array());
   $id = $obj->id;
   $lastchangedate = (string)$obj->lastModifiedDate;
@@ -63,5 +65,6 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
       cache_set($cachename, $id2mdvalue[$id], $cachebin);
     }
   }
+_islandora_bottleneck_spotter_mark('icar md end', array('icar md start' => 'md ophalen'));
   return $id2mdvalue[$id][$neededmdkey];
 }
