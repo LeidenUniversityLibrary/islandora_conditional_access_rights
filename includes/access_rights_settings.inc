@@ -11,8 +11,10 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
   $conditionconfig = $config['condition'];
   $conditions = array();
 
+  $mdvalues = islandora_conditional_access_rights_get_metadata_values($object, $config, $conditionvalues['metadata']); 
+  $cmodels = $object->models;
   foreach ($conditionconfig as $conditionname => $conditionvalues) {
-    $conditions[$conditionname] = _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $conditions, $config);
+    $conditions[$conditionname] = _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $mdvalues, $cmodels, $conditions, $config);
     if ($conditions[$conditionname]) {
       $conditionsmet[$conditionname] = FALSE;
     }
@@ -72,14 +74,13 @@ function _islandora_conditional_access_rights_is_dependent_on($dependency, $cond
   return $isdependent;
 }
 
-function _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $existingconditions, $config) {
+function _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $mdvalues, $cmodels, $existingconditions) {
   $results = array();
   $operator = 'and';
   if (isset($conditionvalues['operator'])) {
     $operator = $conditionvalues['operator'];
   }
   if (isset($conditionvalues['metadata'], $conditionvalues['comparator'], $conditionvalues['value'])) {
-    $mdvalues = islandora_conditional_access_rights_get_metadata_values($object, $config, $conditionvalues['metadata']); 
     $comparator = $conditionvalues['comparator'];
     $value = $conditionvalues['value'];
     $prefix = '_islandora_conditional_access_rights_comparator_';
@@ -118,7 +119,7 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
     $results[] = $isinrange; 
   }
   if (isset($conditionvalues['content_model'])) {
-    $results[] = (count(array_intersect($object->models, $conditionvalues['content_model'])) > 0);
+    $results[] = (count(array_intersect($cmodels, $conditionvalues['content_model'])) > 0);
   }
   if (isset($conditionvalues['condition'])) {
     foreach ($conditionvalues['condition'] as $conditionname) {
@@ -444,6 +445,28 @@ _islandora_bottleneck_spotter_mark('icar access start', NULL, $obj->id);
     }
     if (empty($disregard)) {
       $settings[$obj->id] = $accesssettings;
+      if (isset($part_of[0]['object']['value'])) {
+        // If a part of something is found, odds are that the other parts will also be asked,
+        // so cache them in advance for performance reasons.
+        $pobj = islandora_object_load($part_of[0]['object']['value']);
+        if (isset($pobj) && in_array('islandora:compoundCModel', $pobj->models)) {
+          $childids = islandora_compound_object_get_parts($pobj->id);
+          foreach ($childids as $childid) {
+            if (!isset($settings[$childid])) {
+              $settings[$childid] = $accesssettings;
+            }
+          }
+        }
+        elseif (isset($pobj) && in_array('islandora:bookCModel', $pobj->models)) {
+          module_load_include('inc', 'islandora_paged_content', 'includes/utilities');
+          $pages = islandora_paged_content_get_pages($pobj);
+          foreach ($pages as $pageid => $page) {
+            if (!isset($settings[$pageid])) {
+              $settings[$pageid] = $accesssettings;
+            }
+          }
+        }
+      }
     }
     else {
       return $accesssettings;
