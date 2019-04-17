@@ -377,8 +377,6 @@ function islandora_conditional_access_rights_access_description($obj, $disregard
 }
 
 function islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard = array()) {
-module_load_include('module', 'islandora_bottleneck_spotter');
-_islandora_bottleneck_spotter_mark('icar access start', NULL, $obj->id);
 
   $settings = &drupal_static(__FUNCTION__);
 
@@ -472,7 +470,6 @@ _islandora_bottleneck_spotter_mark('icar access start', NULL, $obj->id);
       return $accesssettings;
     }
   }
-_islandora_bottleneck_spotter_mark('icar access end', array('icar access start' => 'access'));
 
   return $settings[$obj->id];
 }
