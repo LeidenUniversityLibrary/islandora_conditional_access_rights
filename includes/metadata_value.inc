@@ -36,7 +36,7 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
           $content = $obj[$dsid]->content;
           $domdoc = new DOMDocument();
           if ($domdoc->loadXML($content)) {
-            $id2mdvalue[$id][$mdkey] = ''; // subtle change to indicate that the DS XML exists, but does not have the metadata value
+            $id2mdvalue[$id][$mdkey] = array(); // subtle change to indicate that the DS XML exists, but does not have the metadata value
             $domxpath = new DOMXPath($domdoc);
             if (isset($mdvalues['namespace'])) {
               foreach ($mdvalues['namespace'] as $ns) {
