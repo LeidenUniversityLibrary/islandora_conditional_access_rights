@@ -17,7 +17,7 @@ Install as usual, see [this](https://drupal.org/documentation/install/modules-th
 
 ## Configuration
 
-At `admin/islandora/tools/access_rights` the configuration location can be defined. This should be an absolute file path
+At `admin/islandora/tools/islandora_conditional_access_rights` the configuration location can be defined. This should be an absolute file path
 or a URL to the configuration file. See 'ini file' for more information.
 
 ### ini file
