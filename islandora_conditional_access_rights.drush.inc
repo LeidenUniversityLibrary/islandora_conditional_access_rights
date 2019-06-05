@@ -4,7 +4,7 @@
  * Functions for batch checking the access rights settings of objects.
  *
  *
- *  Copyright 2017 Leiden University Library
+ *  Copyright 2017-2019 Leiden University Library
  *
  *  This file is part of islandora_conditional_access_rights.
  *
@@ -28,14 +28,16 @@
  */
 function islandora_conditional_access_rights_drush_command() {
   $items['check_access_rights_settings'] = array(
-    'description' => 'Check the access rights settings of the children of a specific collection.',
+    'description' => 'Check the access rights configuration and optionally the settings of the children of a specific collection.',
     'options' => array(
-      'collection' => 'Mandatory, one collection ID.',
       'configuration' => 'Mandatory, the absolute filepath to an ini file.',
+      'collection' => 'Optional, one collection ID.',
       'limit_to_object' => 'Optional, limit the access rights finding to the object itself, so do not use its parent or the default settings.',
     ),
     'aliases' => array('cars'),
     'examples' => array(
+      'drush --user=admin check_access_rights_settings --configuration=/path/to/a/ini/file',
+      'drush --user=admin check_access_rights_settings --configuration=/url/to/a/ini/file',
       'drush --user=admin check_access_rights_settings --collection=islandora:root --configuration=/path/to/a/ini/file',
       'drush --user=admin check_access_rights_settings --collection=islandora:root --configuration=/url/to/a/ini/file',
       'drush --user=admin cars --collection=islandora:root --configuration=/url/to/a/ini/file',
@@ -56,7 +58,7 @@ function _islandora_conditional_access_rights_validate_collection_configuration(
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = drush_get_option('configuration');
-  $collection = drush_get_option('collection');
+  $collectionid = drush_get_option('collection');
   $configdir = '';
   $configspecificfile = '';
 
@@ -70,12 +72,11 @@ function _islandora_conditional_access_rights_validate_collection_configuration(
   }
 
   // check collection option
-  if (!isset($collection)) {
-    return drush_set_error("Argument collection is mandatory!");
-  }
-  $collectionobj = islandora_object_load($collection);
-  if (!($collectionobj && in_array('islandora:collectionCModel', $collectionobj->models))) {
-    return drush_set_error("Collection '$collection' does not resolve to a collection");
+  if (isset($collectionid)) {
+    $collection = islandora_object_load($collectionid);
+    if (!($collection && in_array('islandora:collectionCModel', $collection->models))) {
+      return drush_set_error("Collection '$collectionid' does not resolve to a collection");
+    }
   }
  
   return TRUE;
@@ -89,14 +90,18 @@ function drush_islandora_conditional_access_rights_check_access_rights_settings(
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
   $configlocation = drush_get_option('configuration');
-  $collection = drush_get_option('collection');
+  $collectionid = drush_get_option('collection');
   $limittoobject = drush_get_option('limit_to_object');
 
-  $collectionobj = islandora_object_load($collection);
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  if ($collectionobj && in_array('islandora:collectionCModel', $collectionobj->models)) {
+  if (!isset($collectionid)) {
+    print "\nConfiguration at $configlocation is checked.\n";
+    return;
+  }
+  $collection = islandora_object_load($collectionid);
+  if ($collection && in_array('islandora:collectionCModel', $collection->models)) {
     $accessvalue2objids = array();
-    list($count, $colobjs) = islandora_basic_collection_get_member_objects($collectionobj, -1, -1);
+    list($count, $colobjs) = islandora_basic_collection_get_member_objects($collection, -1, -1);
     foreach ($colobjs as $colobj) {
       $cid = $colobj['object']['value'];
       $cobj = islandora_object_load($cid);
