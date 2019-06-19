@@ -10,6 +10,7 @@ function islandora_conditional_access_rights_access_rights_settings_for_object($
 
   $conditionconfig = $config['condition'];
   $conditions = array();
+  $conditionsmet = array();
 
   foreach ($conditionconfig as $conditionname => $conditionvalues) {
     $conditions[$conditionname] = _islandora_conditional_access_rights_evaluate_condition($conditionvalues, $object, $conditions, $config);

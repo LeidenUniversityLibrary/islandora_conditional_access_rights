@@ -229,12 +229,12 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
       if (!$isvalid) {
         // config is not valid; the only save thing we can do is bail...
         $error = "Error when reading configuration of 'Islandora conditional access rights': $error";
-        throw new RuntimeException($error);
+        watchdog('islandora_conditional_access_rights', $error, NULL, WATCHDOG_CRITICAL, $configlocation);
       }
-      $aconfig = array();
+      $aconfig = array('metadata' => array(), 'condition' => array(), 'access' => array());
       if (is_file($configlocation)) {
         $stat = stat($configlocation);
-        $aconfig = array('_moddate_' => $stat['mtime']);
+        $aconfig += array('_moddate_' => $stat['mtime']);
       }
       if ($inicontent !== FALSE) {
         $iniarray = parse_ini_string($inicontent, TRUE);
