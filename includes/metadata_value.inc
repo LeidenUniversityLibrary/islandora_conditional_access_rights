@@ -28,7 +28,7 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
       $mdsettings = $config['metadata'];
       foreach ($mdsettings as $mdkey => $mdvalues) {
         $dsid = $mdvalues['datastream'];
-        $id2mdvalue[$id][$mdkey] = NULL;
+        $id2mdvalue[$id][$mdkey] = array();
         if (isset($obj[$dsid])) {
           $xpaths = $mdvalues['xpath'];
           $remove = array();
@@ -36,7 +36,6 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
           $content = $obj[$dsid]->content;
           $domdoc = new DOMDocument();
           if ($domdoc->loadXML($content)) {
-            $id2mdvalue[$id][$mdkey] = array(); // subtle change to indicate that the DS XML exists, but does not have the metadata value
             $domxpath = new DOMXPath($domdoc);
             if (isset($mdvalues['namespace'])) {
               foreach ($mdvalues['namespace'] as $ns) {
@@ -50,9 +49,6 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
               foreach ($domnodelist as $domnode) {
                 $text = $domnode->textContent;
                 if (isset($text) && strlen($text) > 0) {
-                  if (!isset($id2mdvalue[$id][$mdkey])) {
-                    $id2mdvalue[$id][$mdkey] = array();
-                  }
                   $id2mdvalue[$id][$mdkey][] = $text;
                 }
               }
