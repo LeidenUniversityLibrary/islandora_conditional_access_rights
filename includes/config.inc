@@ -236,7 +236,7 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
         $stat = stat($configlocation);
         $aconfig += array('_moddate_' => $stat['mtime']);
       }
-      if ($inicontent !== FALSE) {
+      if ($isvalid) {
         $iniarray = parse_ini_string($inicontent, TRUE);
         if ($iniarray) {
           foreach ($iniarray as $sk => $vs) {
