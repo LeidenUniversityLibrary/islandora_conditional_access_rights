@@ -78,7 +78,7 @@ function _islandora_conditional_access_rights_validate_collection_configuration(
       return drush_set_error("Collection '$collectionid' does not resolve to a collection");
     }
   }
- 
+
   return TRUE;
 }
 
@@ -107,7 +107,7 @@ function drush_islandora_conditional_access_rights_check_access_rights_settings(
       $cobj = islandora_object_load($cid);
       if ($cobj) {
         if ($limittoobject) {
-          $ars = islandora_conditional_access_rights_access_rights_settings_for_object($cobj, $config); 
+          $ars = islandora_conditional_access_rights_access_rights_settings_for_object($cobj, $config);
         }
         else {
           $ars = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($cobj, $config);

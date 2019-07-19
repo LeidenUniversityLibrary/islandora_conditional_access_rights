@@ -3,6 +3,24 @@
 /**
  * @file
  * Calculate the access rights settings for a specific object.
+ *
+ *
+ *  Copyright 2017-2019 Leiden University Library
+ *
+ *  This file is part of islandora_conditional_access_rights.
+ *
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 function islandora_conditional_access_rights_access_rights_settings_for_object($object, $config, $disregard = array()) {
@@ -80,7 +98,7 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
     $operator = $conditionvalues['operator'];
   }
   if (isset($conditionvalues['metadata'], $conditionvalues['comparator'], $conditionvalues['value'])) {
-    $mdvalues = islandora_conditional_access_rights_get_metadata_values($object, $config, $conditionvalues['metadata']); 
+    $mdvalues = islandora_conditional_access_rights_get_metadata_values($object, $config, $conditionvalues['metadata']);
     $comparator = $conditionvalues['comparator'];
     $value = $conditionvalues['value'];
     $prefix = '_islandora_conditional_access_rights_comparator_';
@@ -116,7 +134,7 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
         }
       }
     }
-    $results[] = $isinrange; 
+    $results[] = $isinrange;
   }
   if (isset($conditionvalues['content_model'])) {
     $results[] = (count(array_intersect($object->models, $conditionvalues['content_model'])) > 0);
@@ -135,7 +153,7 @@ function _islandora_conditional_access_rights_evaluate_condition($conditionvalue
   }
   else {
     // AND
-    $result = (count($results) > 0) && (count($trues) === count($results));  
+    $result = (count($results) > 0) && (count($trues) === count($results));
   }
   if ($operator === 'negate' || $operator === 'not') {
     // NOT
@@ -160,8 +178,8 @@ function _islandora_conditional_access_rights_comparator_equals($value1, $value2
 }
 
 function _islandora_conditional_access_rights_comparator_afterDateISO8601($value1, $value2) {
-  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);  
-  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);  
+  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);
+  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);
 
   if ($date1 === FALSE || $date2 === FALSE) {
     return FALSE;
@@ -171,8 +189,8 @@ function _islandora_conditional_access_rights_comparator_afterDateISO8601($value
 }
 
 function _islandora_conditional_access_rights_comparator_beforeDateISO8601($value1, $value2) {
-  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);  
-  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);  
+  $date1 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value1);
+  $date2 = _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer($value2);
 
   if ($date1 === FALSE || $date2 === FALSE) {
     return FALSE;
@@ -190,10 +208,10 @@ function _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer
     return date("Y-m-d\TH:i:s\Z");
   }
   elseif (preg_match('/^(\d{4})-?(\d\d)-?(\d\d)$/', $value, $matches) === 1) {
-    return $matches[1] . '-' . $matches[2] . '-' . $matches[3]; 
+    return $matches[1] . '-' . $matches[2] . '-' . $matches[3];
   }
   elseif (preg_match('/^(\d{4})-?(\d\d)-?(\d\d)T(\d\d):?(\d\d):?(\d\d)Z?$/', $value, $matches) === 1) {
-    return $matches[1] . '-' . $matches[2] . '-' . $matches[3] . 'T' . $matches[4] . ':' . $matches[5] . ':' . $matches[6] . 'Z'; 
+    return $matches[1] . '-' . $matches[2] . '-' . $matches[3] . 'T' . $matches[4] . ':' . $matches[5] . ':' . $matches[6] . 'Z';
   }
   elseif (preg_match('/^(\d{4})-?(\d\d)-?(\d\d)T(\d\d):?(\d\d):?(\d\d)([+-])(\d\d)(?::?(\d\d))?$/', $value, $matches) === 1) {
     $day = $matches[3];
@@ -222,7 +240,7 @@ function _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer
     }
     // there might be some problems with specific dates (e.g. 2018-01-01T01:00:00+04:00 becomes 2018-01-00T21:00Z),
     // but this isn't that big of a problem when comparing dates
-    return $matches[1] . '-' . $matches[2] . '-' . $day . 'T' . $hour . ':' . $minute . ':' . $matches[6] . 'Z'; 
+    return $matches[1] . '-' . $matches[2] . '-' . $day . 'T' . $hour . ':' . $minute . ':' . $matches[6] . 'Z';
   }
   else {
     return FALSE;
@@ -232,11 +250,11 @@ function _islandora_conditional_access_rights_comparator_date_ISO8601_normalizer
 function islandora_conditional_access_rights_unfold_dsid_array($cnfg, $key, $obj, $dontmessdsids = array()) {
   if (!isset($cnfg[$key])) {
     return array();
-  }       
+  }
   $dsids = $cnfg[$key];
   if (in_array('NONE', $dsids)) {
     return array();
-  }     
+  }
   if (in_array('ALL', $dsids)) {
     $dsids = array();
     foreach ($obj as $ds) {
@@ -244,17 +262,17 @@ function islandora_conditional_access_rights_unfold_dsid_array($cnfg, $key, $obj
       if (!in_array($dsid, $dontmessdsids)) {
         $dsids[] = $dsid;
       }
-    }   
-  }     
+    }
+  }
   return $dsids;
-}     
+}
 
 function islandora_conditional_access_rights_accessible_object($obj, $disregard = array()) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  
+
   $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   if (isset($accesssettings['deny_viewing'])) {
@@ -268,7 +286,7 @@ function islandora_conditional_access_rights_accessible_dsids($obj, $disregard =
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  
+
   $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
@@ -285,7 +303,7 @@ function islandora_conditional_access_rights_restricted_dsids($obj, $disregard =
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  
+
   $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $accessibledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'allow_access_to_dsid', $obj);
@@ -302,7 +320,7 @@ function islandora_conditional_access_rights_downloadable_dsids_with_label($obj,
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  
+
   $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $downloadabledsids = islandora_conditional_access_rights_unfold_dsid_array($accesssettings, 'provide_download_of_dsid', $obj, array('RELS-INT','RELS-EXT','POLICY'));
@@ -364,7 +382,7 @@ function islandora_conditional_access_rights_access_description($obj, $disregard
 
   $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   $config = islandora_conditional_access_rights_get_configuration($configlocation);
-  
+
   $accesssettings = islandora_conditional_access_rights_get_access_settings_from_object_or_parent($obj, $config, $disregard);
 
   $result = array();
@@ -382,13 +400,13 @@ function islandora_conditional_access_rights_get_access_settings_from_object_or_
 
   if (!isset($settings[$obj->id]) || !empty($disregard)) {
     module_load_include('inc', 'islandora_conditional_access_rights', 'includes/config');
-  
+
     $accesssettings = islandora_conditional_access_rights_access_rights_settings_for_object($obj, $config, $disregard);
     if (!empty($accesssettings)) {
       $accesssettings['_source_of_settings'][] = $obj->id;
     }
     $neededkeys = array_keys(islandora_conditional_access_rights_default_settings());
-  
+
     $part_of = NULL;
 
     if (!islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
@@ -419,7 +437,7 @@ function islandora_conditional_access_rights_get_access_settings_from_object_or_
               $accesssettings['_ip_dependent'] = $accesssettings['_ip_dependent'] || $paccesssettings['_ip_dependent'];
               $accesssettings = $accesssettings + $paccesssettings;
               if (islandora_conditional_access_rights_settings_has_all_needed_keys($accesssettings, $neededkeys)) {
-                break; 
+                break;
               }
             }
           }

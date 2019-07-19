@@ -5,7 +5,7 @@
  * islandora_conditional_access_rights
  *
  *
- *  Copyright 2017 Leiden University Library
+ *  Copyright 2017-2019 Leiden University Library
  *
  *  This file is part of islandora_conditional_access_rights.
  *
@@ -46,14 +46,14 @@ function islandora_conditional_access_rights_init() {
 function islandora_conditional_access_rights_menu() {
   $items = array();
   $items['admin/islandora/tools/islandora_conditional_access_rights'] = array(
-    'title' => 'Islandora conditional access rights',
+    'title' => 'Islandora Conditional Access Rights',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('islandora_conditional_access_rights_admin_form'),
     'access arguments' => array(ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_ADMIN_PERMISSION),
     'file' => 'includes/admin.form.inc',
   );
   $items['islandora/object/%islandora_object/manage/access_rights'] = array(
-    'title' => 'Conditional access rights',
+    'title' => 'Conditional Access Rights',
     'type' => MENU_LOCAL_TASK,
     'weight' => 0,
     'page callback' => 'drupal_get_form',
@@ -108,7 +108,7 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
     $additional = '';
     $hasfiles = FALSE;
     $additional .= '<h3>Download</h3>';
-    if (count($dsidswlabel) > 0) { 
+    if (count($dsidswlabel) > 0) {
       $additional .= '<table class="download"><tbody>';
       foreach ($dsidswlabel as $dsid => $label) {
         if (isset($obj[$dsid])) {
@@ -131,11 +131,11 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
     if ($access && count($access) > 0) {
       $additional .= '<TABLE class="access">';
       $additional .= '<TBODY>';
-      if (isset($access['accesstext']) && strlen($access['accesstext']) > 0) { 
+      if (isset($access['accesstext']) && strlen($access['accesstext']) > 0) {
         $additional .= '<TR><TH class="accesstitle">'.t('Restriction on access').'</TH></TR>';
         $additional .= '<TR><TD class="accesscontent">'.$access['accesstext'].'</TD></TR>';
       }
-      if ((isset($access['accessimage']) && strlen($access['accessimage']) > 0) || (isset($access['accessusetext']) && strlen($access['accessusetext']) > 0)) { 
+      if ((isset($access['accessimage']) && strlen($access['accessimage']) > 0) || (isset($access['accessusetext']) && strlen($access['accessusetext']) > 0)) {
         $additional .= '<TR><TH class="usetitle">'.t('Use and reproduction').'</TH></TR><TR>';
         $additional .= '<TD class="usecontent">';
         if (isset($access['accessusetext'])) {
@@ -166,7 +166,7 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
                       '<span>download</span><i class="fa fa-download" aria-hidden="true"></i>',
                       $url,
                       array('attributes' => array('title' => 'download'),'html' => TRUE)
-                    ), 
+                    ),
         ),
       ),
       '#theme' => 'item_list',
@@ -184,7 +184,7 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
  **/
 function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
   if ($hook === 'islandora_book_book') {
-    // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range... 
+    // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range...
     // do it here... but only if book is IP range dependent.
     if (isset($variables['object']) && isset($variables['viewer_id'])) {
       $configlocation = variable_get('islandora_conditional_access_rights_config_location');
@@ -250,10 +250,10 @@ function islandora_conditional_access_rights_islandora_datastream_access($op, $i
     if (!$configlocation) {
       return NULL;
     }
-  
+
     $obj = $islandora_datastream->parent;
     $dsid = $islandora_datastream->id;
-  
+
     return _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user);
   }
   return NULL;
@@ -266,9 +266,9 @@ function _islandora_conditional_access_rights_islandora_datastream_access_on_obj
     // This datastream is restricted and cannot be accessed.
     return FALSE;
   }
-  
+
   // Check if the datastream is allowed.
-  $allowed = islandora_conditional_access_rights_accessible_dsids($obj); 
+  $allowed = islandora_conditional_access_rights_accessible_dsids($obj);
   if (in_array($dsid, $allowed)) {
     // This datastream is allowed and can be accessed.
     return TRUE;
@@ -291,8 +291,8 @@ function islandora_conditional_access_rights_flush_caches() {
 function islandora_conditional_access_rights_boot() {
   // disable caching for islandora objects
   drupal_bootstrap(DRUPAL_BOOTSTRAP_FULL);
-  
-  $configlocation = variable_get('islandora_conditional_access_rights_config_location'); 
+
+  $configlocation = variable_get('islandora_conditional_access_rights_config_location');
   if (!$configlocation) {
     return;
   }

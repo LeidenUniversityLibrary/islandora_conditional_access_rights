@@ -3,6 +3,24 @@
 /**
  * @file
  * Retrieve the metadata value from an object, using caching.
+ *
+ *
+ *  Copyright 2017-2019 Leiden University Library
+ *
+ *  This file is part of islandora_conditional_access_rights.
+ *
+ *  islandora_conditional_access_rights is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 function islandora_conditional_access_rights_get_metadata_values($obj, $config, $neededmdkey, $rebuildcache = FALSE) {
@@ -32,7 +50,7 @@ function islandora_conditional_access_rights_get_metadata_values($obj, $config, 
         if (isset($obj[$dsid])) {
           $xpaths = $mdvalues['xpath'];
           $remove = array();
-        
+
           $content = $obj[$dsid]->content;
           $domdoc = new DOMDocument();
           if ($domdoc->loadXML($content)) {

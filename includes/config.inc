@@ -5,7 +5,7 @@
  * Handle configuration; Parse and validate ini files.
  *
  *
- *  Copyright 2017 Leiden University Library
+ *  Copyright 2017-2019 Leiden University Library
  *
  *  This file is part of islandora_conditional_access_rights.
  *
@@ -34,7 +34,7 @@ function islandora_conditional_access_rights_valid_config_file($inifile, &$error
   }
   return _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, $error);
 }
-  
+
 function _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, &$error) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
@@ -262,8 +262,8 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
               else {
                 $aconfig[$type][$name][$k] = $v;
               }
-            } 
-          } 
+            }
+          }
         }
       }
       $config[$configlocation] = $aconfig;
@@ -277,7 +277,7 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
 function islandora_conditional_access_rights_refresh_configuration($configlocation) {
   $cachename = $configlocation;
   $cachebin = 'cache_islandora_conditional_access_rights_config';
-  cache_clear_all($cachename, $cachebin); 
+  cache_clear_all($cachename, $cachebin);
 }
 
 function has_prefix($str, $prefix) {
