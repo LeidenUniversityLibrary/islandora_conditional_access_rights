@@ -5,7 +5,7 @@
  * Handle configuration; Parse and validate ini files.
  *
  *
- *  Copyright 2017 Leiden University Library
+ *  Copyright 2017-2019 Leiden University Library
  *
  *  This file is part of islandora_conditional_access_rights.
  *
@@ -34,7 +34,7 @@ function islandora_conditional_access_rights_valid_config_file($inifile, &$error
   }
   return _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, $error);
 }
-  
+
 function _islandora_conditional_access_rights_valid_config_content($inicontent, $inifile, &$error) {
   module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
 
@@ -54,7 +54,7 @@ function _islandora_conditional_access_rights_valid_config_content($inicontent, 
     $sectiontype = $keyparts[0];
     $sectionname = $keyparts[1];
     if (has_prefix($key, 'metadata:')) {
-      $mandatory = array('datastream' => '/^[A-Z0-9]+$/', 'xpath' => '');
+      $mandatory = array('datastream' => '/^[A-Z0-9-]+$/', 'xpath' => '');
       $optional = array('namespace' => array());
       if (!_islandora_conditional_access_rights_valid_subkeys($values, $key, $mandatory, $optional, $error)) {
         return FALSE;
@@ -229,14 +229,14 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
       if (!$isvalid) {
         // config is not valid; the only save thing we can do is bail...
         $error = "Error when reading configuration of 'Islandora conditional access rights': $error";
-        throw new RuntimeException($error);
+        watchdog('islandora_conditional_access_rights', $error, NULL, WATCHDOG_CRITICAL, $configlocation);
       }
-      $aconfig = array();
+      $aconfig = array('metadata' => array(), 'condition' => array(), 'access' => array());
       if (is_file($configlocation)) {
         $stat = stat($configlocation);
-        $aconfig = array('_moddate_' => $stat['mtime']);
+        $aconfig += array('_moddate_' => $stat['mtime']);
       }
-      if ($inicontent !== FALSE) {
+      if ($isvalid) {
         $iniarray = parse_ini_string($inicontent, TRUE);
         if ($iniarray) {
           foreach ($iniarray as $sk => $vs) {
@@ -262,8 +262,8 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
               else {
                 $aconfig[$type][$name][$k] = $v;
               }
-            } 
-          } 
+            }
+          }
         }
       }
       $config[$configlocation] = $aconfig;
@@ -277,7 +277,7 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
 function islandora_conditional_access_rights_refresh_configuration($configlocation) {
   $cachename = $configlocation;
   $cachebin = 'cache_islandora_conditional_access_rights_config';
-  cache_clear_all($cachename, $cachebin); 
+  cache_clear_all($cachename, $cachebin);
 }
 
 function has_prefix($str, $prefix) {
