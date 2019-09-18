@@ -61,6 +61,20 @@ function islandora_conditional_access_rights_menu() {
     'access arguments' => array(ISLANDORA_CONDITIONAL_ACCESS_RIGHTS_FOR_OBJECT_PERMISSION),
     'file' => 'includes/object.form.inc',
   );
+  $items['islandora/api/access_v1/%'] = array(
+    'page callback' => 'islandora_conditional_access_rights_access_api_object',
+    'page arguments' => array(3),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
+  $items['islandora/api/access_v1/%/datastream/%'] = array(
+    'page callback' => 'islandora_conditional_access_rights_access_api_datastream',
+    'page arguments' => array(3, 5),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+    'file' => 'includes/accessapi.inc',
+  );
 
   return $items;
 }
