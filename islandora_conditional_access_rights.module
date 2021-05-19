@@ -197,7 +197,7 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
  * Implements hook_preprocess()
  **/
 function islandora_conditional_access_rights_preprocess(&$variables, $hook) {
-  if ($hook === 'islandora_book_book') {
+  if ($hook === 'islandora_book_book' || $hook === 'islandora_newspaper_issue') {
     // pages of a book are retrieved with a server ip address, thus can not check if pages are within IP range...
     // do it here... but only if book is IP range dependent.
     if (isset($variables['object']) && isset($variables['viewer_id'])) {
