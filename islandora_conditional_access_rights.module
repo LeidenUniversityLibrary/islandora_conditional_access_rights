@@ -156,7 +156,7 @@ function islandora_conditional_access_rights_detail_tools_block_view() {
           $additional .= $access['accessusetext'];
         }
         if (isset($access['accesslink']) && strlen($access['accesslink']) > 0) {
-          $additional .= '<a href="'.$access['accesslink'].'" target="_blank">';
+          $additional .= '<a href="'.$access['accesslink'].'" target="_blank" rel="license">';
         }
         $additional .= '<BR/><img class="accessimage" src="'.$access['accessimage'].'">';
         if (isset($access['accesslink'])) {
