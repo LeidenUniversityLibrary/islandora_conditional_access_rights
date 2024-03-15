@@ -274,6 +274,7 @@ function islandora_conditional_access_rights_islandora_datastream_access($op, $i
 }
 
 function _islandora_conditional_access_rights_islandora_datastream_access_on_object($obj, $dsid, $user) {
+  module_load_include('inc', 'islandora_conditional_access_rights', 'includes/access_rights_settings');
   // Check if the datastream is restricted.
   $restricted = islandora_conditional_access_rights_restricted_dsids($obj);
   if (in_array($dsid, $restricted)) {
