@@ -267,8 +267,10 @@ function islandora_conditional_access_rights_get_configuration($configlocation) 
         }
       }
       $config[$configlocation] = $aconfig;
-      $expire_after = time() + (60*60*24); // keep in cache for about a day.
-      cache_set($cachename, $config[$configlocation], $cachebin, $expire_after);
+      if (!empty($aconfig['metadata'])) {
+        $expire_after = time() + (60*60*24); // keep in cache for about a day.
+        cache_set($cachename, $config[$configlocation], $cachebin, $expire_after);
+      }
     }
   }
   return $config[$configlocation];
